@@ -77,11 +77,11 @@ export const GoldCounter: React.FC = () => {
         <Pressable
           style={[
             styles.goldDisplay,
-            { backgroundColor: theme.colors.background, borderColor: theme.colors.border },
+            { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
           ]}
           onLongPress={handleLongPress}
         >
-          <Text style={[styles.goldValue, { color: theme.colors.gold }]}>
+          <Text style={[styles.goldValue, { color: '#FFFFFF' }]}>
             {hero.gold}
           </Text>
         </Pressable>

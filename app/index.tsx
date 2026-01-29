@@ -41,15 +41,53 @@ export default function CharacterSheet() {
 
   // Only dark theme has texture
   const hasTexture = !!theme.backgroundTexture;
-  const Container = hasTexture ? ImageBackground : View;
-  const containerProps = hasTexture
-    ? { source: theme.backgroundTexture, resizeMode: 'repeat' as const }
-    : {};
 
   if (!hero) {
+    if (hasTexture) {
+      return (
+        <ImageBackground
+          source={theme.backgroundTexture}
+          resizeMode="repeat"
+          style={[
+            styles.container,
+            {
+              backgroundColor: theme.colors.background,
+              paddingTop: insets.top,
+              paddingBottom: insets.bottom,
+            },
+          ]}
+        >
+          <View style={styles.emptyStateContainer}>
+            <MaterialCommunityIcons
+              name="sword-cross"
+              size={80}
+              color={theme.colors.textSecondary}
+            />
+            <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+              Welcome, Adventurer!
+            </Text>
+            <Text
+              style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
+            >
+              Create your first hero to begin your quest
+            </Text>
+            <Pressable
+              style={[styles.createButton, { backgroundColor: theme.colors.accent }]}
+              onPress={() => setShowHeroSwitcher(true)}
+            >
+              <Ionicons name="add" size={24} color="#FFFFFF" />
+              <Text style={styles.createButtonText}>Create Hero</Text>
+            </Pressable>
+          </View>
+          <HeroSwitcher
+            visible={showHeroSwitcher}
+            onClose={() => setShowHeroSwitcher(false)}
+          />
+        </ImageBackground>
+      );
+    }
     return (
-      <Container
-        {...containerProps}
+      <View
         style={[
           styles.container,
           {
@@ -86,15 +124,12 @@ export default function CharacterSheet() {
           visible={showHeroSwitcher}
           onClose={() => setShowHeroSwitcher(false)}
         />
-      </Container>
+      </View>
     );
   }
 
-  return (
-    <Container
-      {...containerProps}
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
+  const mainContent = (
+    <>
       {/* Header */}
       <View
         style={[
@@ -234,7 +269,25 @@ export default function CharacterSheet() {
         visible={showHeroSwitcher}
         onClose={() => setShowHeroSwitcher(false)}
       />
-    </Container>
+    </>
+  );
+
+  if (hasTexture) {
+    return (
+      <ImageBackground
+        source={theme.backgroundTexture}
+        resizeMode="repeat"
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
+        {mainContent}
+      </ImageBackground>
+    );
+  }
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {mainContent}
+    </View>
   );
 }
 

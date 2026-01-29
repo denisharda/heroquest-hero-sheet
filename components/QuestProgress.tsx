@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
+import { QUESTS } from '@/data/quests';
 import * as Haptics from 'expo-haptics';
 
 const TOTAL_QUESTS = 14;
@@ -9,6 +11,7 @@ const TOTAL_QUESTS = 14;
 export const QuestProgress: React.FC = () => {
   const { theme } = useTheme();
   const { hero, toggleQuestCompleted } = useHero();
+  const router = useRouter();
 
   if (!hero) return null;
 
@@ -18,6 +21,11 @@ export const QuestProgress: React.FC = () => {
   const handleToggle = async (questNumber: number) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     toggleQuestCompleted(questNumber);
+  };
+
+  const handleLongPress = async (questNumber: number) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push(`/quest/${questNumber}` as any);
   };
 
   return (
@@ -46,11 +54,11 @@ export const QuestProgress: React.FC = () => {
       </View>
 
       <View style={styles.badgesContainer}>
-        {Array.from({ length: TOTAL_QUESTS }, (_, i) => i + 1).map((num) => {
-          const isCompleted = hero.questsCompleted.includes(num);
+        {QUESTS.map((quest) => {
+          const isCompleted = hero.questsCompleted.includes(quest.id);
           return (
             <Pressable
-              key={num}
+              key={quest.id}
               style={[
                 styles.badge,
                 {
@@ -62,7 +70,9 @@ export const QuestProgress: React.FC = () => {
                     : theme.colors.border,
                 },
               ]}
-              onPress={() => handleToggle(num)}
+              onPress={() => handleToggle(quest.id)}
+              onLongPress={() => handleLongPress(quest.id)}
+              delayLongPress={300}
             >
               <Text
                 style={[
@@ -74,7 +84,7 @@ export const QuestProgress: React.FC = () => {
                   },
                 ]}
               >
-                {num}
+                {quest.id}
               </Text>
             </Pressable>
           );
@@ -82,7 +92,7 @@ export const QuestProgress: React.FC = () => {
       </View>
 
       <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-        Tap to toggle quest completion
+        Tap to toggle completion • Long press for details
       </Text>
     </View>
   );

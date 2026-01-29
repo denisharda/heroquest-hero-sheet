@@ -45,6 +45,12 @@ function RootLayoutNav() {
             animation: 'slide_from_right',
           }}
         />
+        <Stack.Screen
+          name="quest/[id]"
+          options={{
+            animation: 'slide_from_right',
+          }}
+        />
       </Stack>
     </View>
   );
