@@ -184,12 +184,13 @@ export const WEAPONS: Weapon[] = [
   {
     id: 'spirit-blade',
     name: 'Spirit Blade',
-    attackDice: 4,
-    diagonalAttack: true,
+    attackDice: 3,
+    diagonalAttack: false,
     twoHanded: false,
     goldCost: 0,
     isArtifact: true,
-    description: 'The only weapon that can harm the Witch Lord. Allows diagonal attack. Artifact from Quest 12/13.',
+    restrictedClasses: ['Wizard'],
+    description: 'Roll 3 combat dice to attack, or 4 dice against undead (Skeleton, Zombie, Mummy). The only weapon that can harm the Witch Lord. Artifact from Quest 13.',
   },
 ];
 
