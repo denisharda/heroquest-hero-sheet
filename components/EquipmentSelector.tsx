@@ -12,7 +12,7 @@ import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-ico
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { getAvailableWeapons, NO_WEAPON, WEAPONS } from '@/data/weapons';
-import { SHIELDS, NO_SHIELD, HELMETS, NO_HELMET, ARMOR, NO_ARMOR } from '@/data/armor';
+import { getAvailableShields, NO_SHIELD, getAvailableHelmets, NO_HELMET, getAvailableArmor, NO_ARMOR } from '@/data/armor';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
 
@@ -80,11 +80,11 @@ export const EquipmentSelector: React.FC = () => {
       case 'weapon':
         return [NO_WEAPON, ...getAvailableWeapons(hero.heroClass)];
       case 'shield':
-        return [NO_SHIELD, ...SHIELDS];
+        return [NO_SHIELD, ...getAvailableShields(hero.heroClass)];
       case 'helmet':
-        return [NO_HELMET, ...HELMETS];
+        return [NO_HELMET, ...getAvailableHelmets(hero.heroClass)];
       case 'armor':
-        return [NO_ARMOR, ...ARMOR];
+        return [NO_ARMOR, ...getAvailableArmor(hero.heroClass)];
       default:
         return [];
     }
@@ -126,8 +126,10 @@ export const EquipmentSelector: React.FC = () => {
 
   const getStatLabel = (item: EquipmentItem): string => {
     if (selectedSlot === 'weapon') {
-      return `+${(item as Weapon).attackDice} ATK`;
+      // Weapons replace attack dice, not add - so no "+" prefix
+      return `${(item as Weapon).attackDice} ATK`;
     }
+    // Armor adds to base defense, so keep the "+"
     const defItem = item as Shield | Helmet | Armor;
     return defItem.defendDice > 0 ? `+${defItem.defendDice} DEF` : '';
   };

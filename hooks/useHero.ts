@@ -13,17 +13,15 @@ export const useHero = () => {
     const classStats = HERO_CLASSES[hero.heroClass];
     const { equipment } = hero;
 
-    // Calculate attack
-    const baseAttack = classStats.baseAttack;
+    // Calculate attack - weapon REPLACES base attack, doesn't add to it
+    // Unarmed = 1 attack die (minimum per rulebook)
     const weaponAttack = equipment.weapon?.attackDice ?? 0;
-    const totalAttack = baseAttack + weaponAttack;
+    const totalAttack = equipment.weapon ? weaponAttack : 1;
 
     // Build attack breakdown
-    const attackParts: string[] = [`${baseAttack} (base)`];
-    if (equipment.weapon) {
-      attackParts.push(`${weaponAttack} (${equipment.weapon.name})`);
-    }
-    const attackBreakdown = attackParts.join(' + ');
+    const attackBreakdown = equipment.weapon
+      ? `${weaponAttack} (${equipment.weapon.name})`
+      : '1 (unarmed)';
 
     // Calculate defense
     const baseDefend = classStats.baseDefend;

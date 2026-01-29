@@ -670,11 +670,38 @@ export const useHeroStore = create<HeroStore>()(
     }),
     {
       name: 'heroquest-heroes',
+      version: 1,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         heroes: state.heroes,
         currentHeroId: state.currentHeroId,
       }),
+      migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as { heroes: Hero[]; currentHeroId: string | null };
+
+        // Migration from version 0 (no version) to version 1
+        if (version === 0) {
+          // Ensure all heroes have required fields with defaults
+          const migratedHeroes = state.heroes.map((hero: Hero) => ({
+            ...hero,
+            // Add any missing fields with defaults
+            inventory: hero.inventory ?? [],
+            questsCompleted: hero.questsCompleted ?? [],
+            createdAt: hero.createdAt ?? Date.now(),
+            updatedAt: hero.updatedAt ?? Date.now(),
+          }));
+
+          return {
+            ...state,
+            heroes: migratedHeroes,
+          };
+        }
+
+        // Future migrations can be added here:
+        // if (version === 1) { ... migrate to version 2 ... }
+
+        return state;
+      },
     }
   )
 );

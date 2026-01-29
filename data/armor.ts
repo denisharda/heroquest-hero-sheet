@@ -4,11 +4,11 @@ import { Shield, Helmet, Armor, HeroClassName } from '@/types';
 export const SHIELDS: Shield[] = [
   {
     id: 'small-shield',
-    name: 'Small Shield',
+    name: 'Shield',
     defendDice: 1,
     goldCost: 150,
     restrictedClasses: ['Wizard'],
-    description: 'A light metal shield. Cannot be used by Wizards or with 2H weapons.',
+    description: 'Adds +1 defense die. Cannot be used by Wizards or with two-handed weapons.',
   },
   {
     id: 'large-shield',
@@ -16,7 +16,7 @@ export const SHIELDS: Shield[] = [
     defendDice: 2,
     goldCost: 300,
     restrictedClasses: ['Wizard'],
-    description: 'A heavy shield. Cannot be used by Wizards or with 2H weapons. (Expansion content)',
+    description: 'Adds +2 defense dice. Cannot be used by Wizards or with two-handed weapons. (Expansion)',
   },
 ];
 
@@ -46,7 +46,7 @@ export const HELMETS: Helmet[] = [
     defendDice: 1,
     goldCost: 125,
     restrictedClasses: ['Wizard'],
-    description: 'A sturdy iron helmet. Cannot be used by Wizards.',
+    description: 'Adds +1 defense die. Cannot be used by Wizards.',
   },
 ];
 
@@ -76,7 +76,7 @@ export const ARMOR: Armor[] = [
     defendDice: 1,
     goldCost: 500,
     restrictedClasses: ['Wizard'],
-    description: 'Interlocking metal rings. Cannot be used by Wizards.',
+    description: 'Adds +1 defense die. Interlocking metal rings. Cannot be used by Wizards.',
   },
   {
     id: 'plate-mail',
@@ -85,7 +85,7 @@ export const ARMOR: Armor[] = [
     goldCost: 850,
     restrictedClasses: ['Wizard'],
     movementPenalty: true,
-    description: 'Heavy plate armor. Movement reduced to 1d6. Cannot be used by Wizards.',
+    description: 'Adds +2 defense dice, but movement is reduced to 1d6. Cannot be used by Wizards.',
   },
 ];
 

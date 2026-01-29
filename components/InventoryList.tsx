@@ -9,6 +9,7 @@ import {
   SectionList,
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { ITEM_DEFINITIONS, ITEM_CATEGORIES, createItemInstance } from '@/data/items';
@@ -18,14 +19,12 @@ import * as Haptics from 'expo-haptics';
 
 interface InventoryItemProps {
   item: Item;
-  onAdjustQuantity: (delta: number) => void;
-  onRemove: () => void;
+  onPress: () => void;
 }
 
 const InventoryItem: React.FC<InventoryItemProps> = ({
   item,
-  onAdjustQuantity,
-  onRemove,
+  onPress,
 }) => {
   const { theme } = useTheme();
   const categoryColor = ITEM_CATEGORY_COLORS[item.category];
@@ -45,12 +44,18 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
     }
   };
 
+  const handlePress = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  };
+
   return (
-    <View
+    <Pressable
       style={[
         styles.inventoryItem,
         { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
       ]}
+      onPress={handlePress}
     >
       <MaterialCommunityIcons
         name={getCategoryIcon() as any}
@@ -66,50 +71,20 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         </Text>
       </View>
 
-      <View style={styles.quantityControls}>
-        <Pressable
-          style={[
-            styles.quantityButton,
-            { backgroundColor: theme.colors.danger + '20' },
-          ]}
-          onPress={() => onAdjustQuantity(-1)}
-        >
-          <Text style={[styles.quantityButtonText, { color: theme.colors.danger }]}>
-            -
-          </Text>
-        </Pressable>
+      <Text style={[styles.quantity, { color: theme.colors.text }]}>
+        x{item.quantity}
+      </Text>
 
-        <Text style={[styles.quantity, { color: theme.colors.text }]}>
-          x{item.quantity}
-        </Text>
-
-        <Pressable
-          style={[
-            styles.quantityButton,
-            { backgroundColor: theme.colors.success + '20' },
-          ]}
-          onPress={() => onAdjustQuantity(1)}
-        >
-          <Text style={[styles.quantityButtonText, { color: theme.colors.success }]}>
-            +
-          </Text>
-        </Pressable>
-      </View>
-
-      <Pressable
-        style={styles.removeButton}
-        onPress={onRemove}
-      >
-        <Ionicons name="trash-outline" size={20} color={theme.colors.danger} />
-      </Pressable>
-    </View>
+      <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+    </Pressable>
   );
 };
 
 export const InventoryList: React.FC = () => {
   const { theme } = useTheme();
-  const { hero, addItem, removeItem, updateItemQuantity } = useHero();
+  const { hero, addItem } = useHero();
   const [showAddModal, setShowAddModal] = useState(false);
+  const router = useRouter();
 
   if (!hero) return null;
 
@@ -122,17 +97,8 @@ export const InventoryList: React.FC = () => {
     setShowAddModal(false);
   };
 
-  const handleAdjustQuantity = async (itemId: string, delta: number) => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const item = hero.inventory.find((i) => i.id === itemId);
-    if (item) {
-      updateItemQuantity(itemId, item.quantity + delta);
-    }
-  };
-
-  const handleRemove = async (itemId: string) => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    removeItem(itemId);
+  const handleItemPress = (itemId: string) => {
+    router.push(`/item/${itemId}`);
   };
 
   // Group items by category for the add modal
@@ -182,8 +148,7 @@ export const InventoryList: React.FC = () => {
           <InventoryItem
             key={item.id}
             item={item}
-            onAdjustQuantity={(delta) => handleAdjustQuantity(item.id, delta)}
-            onRemove={() => handleRemove(item.id)}
+            onPress={() => handleItemPress(item.id)}
           />
         ))
       )}
@@ -333,31 +298,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginTop: 2,
   },
-  quantityControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  quantityButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quantityButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   quantity: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginHorizontal: 8,
-    minWidth: 30,
-    textAlign: 'center',
-  },
-  removeButton: {
-    padding: 4,
+    marginRight: 8,
   },
   modalOverlay: {
     flex: 1,

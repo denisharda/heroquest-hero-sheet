@@ -10,7 +10,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: false,
     throwable: true,
     goldCost: 25,
-    description: 'Throwable (lost when used).',
+    description: 'Throwable for ranged attack (lost when thrown). The only weapon Wizards can purchase.',
   },
   {
     id: 'hatchet',
@@ -21,7 +21,7 @@ export const WEAPONS: Weapon[] = [
     throwable: true,
     goldCost: 50,
     restrictedClasses: ['Wizard'],
-    description: 'Throwable. Cannot be used by Wizards.',
+    description: 'Throwable (lost when thrown). Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'whip',
@@ -31,7 +31,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: false,
     goldCost: 125,
     restrictedClasses: ['Wizard'],
-    description: 'A flexible weapon. Cannot be used by Wizards.',
+    description: 'A flexible weapon. Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'shortsword',
@@ -52,7 +52,7 @@ export const WEAPONS: Weapon[] = [
     throwable: true,
     goldCost: 200,
     restrictedClasses: ['Wizard'],
-    description: 'Throwable. Cannot be used by Wizards.',
+    description: 'Throwable (lost when thrown). Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'hammer',
@@ -63,7 +63,7 @@ export const WEAPONS: Weapon[] = [
     throwable: true,
     goldCost: 200,
     restrictedClasses: ['Wizard'],
-    description: 'Throwable. Cannot be used by Wizards.',
+    description: 'Throwable (lost when thrown). Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'flail',
@@ -73,7 +73,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: false,
     goldCost: 250,
     restrictedClasses: ['Wizard'],
-    description: 'A spiked ball on a chain. Cannot be used by Wizards.',
+    description: 'A spiked ball on a chain. Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'broadsword',
@@ -115,7 +115,7 @@ export const WEAPONS: Weapon[] = [
     ranged: true,
     goldCost: 100,
     restrictedClasses: ['Wizard'],
-    description: 'Ranged. Two-handed, 1 turn to switch weapons. Cannot be used by Wizards.',
+    description: 'Ranged. Two-handed. Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'longbow',
@@ -126,7 +126,7 @@ export const WEAPONS: Weapon[] = [
     ranged: true,
     goldCost: 200,
     restrictedClasses: ['Wizard'],
-    description: 'Ranged. Two-handed, 1 turn to switch weapons. Cannot be used by Wizards.',
+    description: 'Ranged. Two-handed. Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'crossbow',
@@ -137,7 +137,7 @@ export const WEAPONS: Weapon[] = [
     ranged: true,
     goldCost: 350,
     restrictedClasses: ['Wizard'],
-    description: 'Ranged. Two-handed, 1 turn reload. Cannot be used by Wizards.',
+    description: 'Ranged. Requires 1 turn to reload after firing. Two-handed. Cannot be used by Wizards.',
   },
   {
     id: 'spear',
@@ -147,7 +147,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: true,
     goldCost: 400,
     restrictedClasses: ['Wizard'],
-    description: '2-square range. Two-handed, no shield. Cannot be used by Wizards.',
+    description: '2-square range. Two-handed. Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'battle-axe',
@@ -167,7 +167,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: true,
     goldCost: 500,
     restrictedClasses: ['Wizard'],
-    description: '2-square range. Two-handed, no shield. Cannot be used by Wizards.',
+    description: '2-square range. Two-handed. Cannot be used by Wizards. (Expansion)',
   },
   {
     id: 'two-handed-sword',
@@ -177,7 +177,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: true,
     goldCost: 600,
     restrictedClasses: ['Wizard'],
-    description: 'Maximum melee power. Two-handed, no shield. Cannot be used by Wizards.',
+    description: 'Maximum melee power. Two-handed. Cannot be used by Wizards. (Expansion)',
   },
 
   // Artifact Weapon
@@ -189,7 +189,7 @@ export const WEAPONS: Weapon[] = [
     twoHanded: false,
     goldCost: 0,
     isArtifact: true,
-    description: 'A magical blade. Artifact - cannot be purchased.',
+    description: 'The only weapon that can harm the Witch Lord. Allows diagonal attack. Artifact from Quest 12/13.',
   },
 ];
 
