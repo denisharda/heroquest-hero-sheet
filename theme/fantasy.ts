@@ -3,15 +3,16 @@ import { Theme } from '@/types';
 export const fantasyTheme: Theme = {
   name: 'fantasy',
   isDark: false,
+  // No texture for light theme - using solid old paper color
   colors: {
     // Primary colors - warm medieval feel
     primary: '#8B4513',       // Saddle Brown
     secondary: '#DAA520',     // Goldenrod
 
-    // Backgrounds
-    background: '#F5E6C8',    // Parchment
-    surface: '#FFF8E7',       // Light parchment
-    surfaceVariant: '#EAD9B5', // Darker parchment
+    // Backgrounds - aged paper tones
+    background: '#E8D9B5',    // Old paper / aged parchment
+    surface: '#F5EDE0',       // Lighter aged paper
+    surfaceVariant: '#DDD0B8', // Darker aged paper
 
     // Text
     text: '#2F1810',          // Dark brown

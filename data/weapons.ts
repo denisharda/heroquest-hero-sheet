@@ -219,10 +219,10 @@ export const getStartingWeapon = (heroClass: HeroClassName): Weapon | null => {
 
 export const NO_WEAPON: Weapon = {
   id: 'none',
-  name: 'None (Unarmed)',
+  name: 'Base weapon',
   attackDice: 0,
   diagonalAttack: false,
   twoHanded: false,
   goldCost: 0,
-  description: 'Fighting without a weapon.',
+  description: 'Using your starting equipment.',
 };

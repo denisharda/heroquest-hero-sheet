@@ -3,6 +3,7 @@ import { Theme } from '@/types';
 export const darkFantasyTheme: Theme = {
   name: 'darkFantasy',
   isDark: true,
+  // No texture - using solid dark fantasy color
   colors: {
     // Primary colors - gothic dungeon feel
     primary: '#8B0000',       // Dark blood red

@@ -149,4 +149,5 @@ export interface Theme {
   name: ThemeName;
   colors: ThemeColors;
   isDark: boolean;
+  backgroundTexture?: any; // ImageSourcePropType
 }

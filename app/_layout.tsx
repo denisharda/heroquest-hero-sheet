@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '@/theme/ThemeContext';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
+import {
+  useFonts,
+  Cinzel_400Regular,
+  Cinzel_500Medium,
+  Cinzel_600SemiBold,
+  Cinzel_700Bold,
+} from '@expo-google-fonts/cinzel';
 
 function RootLayoutNav() {
   const { theme } = useTheme();
@@ -44,6 +51,30 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Cinzel_400Regular,
+    Cinzel_500Medium,
+    Cinzel_600SemiBold,
+    Cinzel_700Bold,
+  });
+
+  // On web, fonts may take longer or fail - add timeout fallback
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setTimedOut(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const ready = fontsLoaded || timedOut || Platform.OS === 'web';
+
+  if (!ready) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <ThemeProvider>
@@ -56,5 +87,10 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5E6C8',
   },
 });

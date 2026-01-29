@@ -97,9 +97,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: 'Cinzel_600SemiBold',
     marginBottom: 4,
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   textInput: {
     height: 40,
@@ -107,6 +108,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 12,
     fontSize: 16,
+    fontFamily: 'Cinzel_500Medium',
   },
   classDisplay: {
     height: 40,
@@ -130,7 +132,7 @@ const styles = StyleSheet.create({
   },
   classDisplayText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Cinzel_600SemiBold',
     marginLeft: 8,
   },
 });

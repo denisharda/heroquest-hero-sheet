@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  ImageBackground,
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,9 +39,17 @@ export default function CharacterSheet() {
     }
   }, [hero]);
 
+  // Only dark theme has texture
+  const hasTexture = !!theme.backgroundTexture;
+  const Container = hasTexture ? ImageBackground : View;
+  const containerProps = hasTexture
+    ? { source: theme.backgroundTexture, resizeMode: 'repeat' as const }
+    : {};
+
   if (!hero) {
     return (
-      <View
+      <Container
+        {...containerProps}
         style={[
           styles.container,
           {
@@ -77,12 +86,13 @@ export default function CharacterSheet() {
           visible={showHeroSwitcher}
           onClose={() => setShowHeroSwitcher(false)}
         />
-      </View>
+      </Container>
     );
   }
 
   return (
-    <View
+    <Container
+      {...containerProps}
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       {/* Header */}
@@ -224,7 +234,7 @@ export default function CharacterSheet() {
         visible={showHeroSwitcher}
         onClose={() => setShowHeroSwitcher(false)}
       />
-    </View>
+    </Container>
   );
 }
 
@@ -246,7 +256,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Cinzel_700Bold',
     marginLeft: 8,
   },
   headerRight: {
@@ -302,7 +312,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Cinzel_700Bold',
     marginTop: 24,
   },
   emptySubtitle: {
