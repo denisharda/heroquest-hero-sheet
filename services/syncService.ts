@@ -107,6 +107,13 @@ class SyncService {
     await this.performFullSync();
   }
 
+  // Called by UI when user cancels conflict resolution (keeps local versions)
+  cancelConflicts() {
+    if (!this.pendingSync) return;
+    this.pendingSync = null;
+    this.updateState({ conflicts: [] });
+  }
+
   // Called by UI after user resolves each conflict
   async resolveConflicts(resolutions: Map<string, 'local' | 'remote'>) {
     if (!this.pendingSync) return;
@@ -155,7 +162,8 @@ class SyncService {
 
       const remoteMap = new Map<string, { data: Hero; updated_at: number }>();
       for (const row of remoteRows ?? []) {
-        remoteMap.set(row.id, { data: row.data as Hero, updated_at: row.updated_at });
+        // Supabase returns bigint columns as strings — coerce to number
+        remoteMap.set(row.id, { data: row.data as Hero, updated_at: Number(row.updated_at) });
       }
 
       const mergedHeroes: Hero[] = [];
@@ -171,28 +179,16 @@ class SyncService {
         const remote = remoteMap.get(id);
 
         if (local && remote) {
-          const localData = JSON.stringify(local);
-          const remoteData = JSON.stringify(remote.data);
-
-          if (localData === remoteData) {
-            // Identical — no conflict
+          if (local.updatedAt === remote.updated_at) {
+            // Same timestamp — same version, no conflict
             mergedHeroes.push(local);
-          } else if (local.updatedAt === remote.updated_at) {
-            // Same timestamp but different data — conflict
-            conflicts.push({
-              heroId: id,
-              heroName: local.name,
-              local,
-              remote: remote.data,
-            });
+          } else if (local.updatedAt > remote.updated_at) {
+            // Local is newer — use local and push to cloud
+            mergedHeroes.push(local);
+            toPush.push(local);
           } else {
-            // Different timestamps and different data — conflict, let user decide
-            conflicts.push({
-              heroId: id,
-              heroName: local.name,
-              local,
-              remote: remote.data,
-            });
+            // Remote is newer — use remote
+            mergedHeroes.push(remote.data);
           }
         } else if (local && !remote) {
           mergedHeroes.push(local);

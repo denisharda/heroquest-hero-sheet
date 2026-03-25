@@ -35,7 +35,7 @@ export default function CharacterSheet() {
   const { hero, createHero } = useHero();
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
   const { isAuthenticated } = useAuth();
-  const { isSyncing, syncError, conflicts, resolveConflicts } = useSync();
+  const { isSyncing, syncError, conflicts, resolveConflicts, cancelConflicts } = useSync();
   const [showHeroSwitcher, setShowHeroSwitcher] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -93,6 +93,7 @@ export default function CharacterSheet() {
           <ConflictResolver
             conflicts={conflicts}
             onResolve={resolveConflicts}
+            onCancel={cancelConflicts}
           />
         </ImageBackground>
       );
@@ -319,6 +320,7 @@ export default function CharacterSheet() {
       <ConflictResolver
         conflicts={conflicts}
         onResolve={resolveConflicts}
+        onCancel={cancelConflicts}
       />
     </>
   );

@@ -17,6 +17,10 @@ export const useSync = () => {
     syncService.resolveConflicts(resolutions);
   }, []);
 
+  const cancelConflicts = useCallback(() => {
+    syncService.cancelConflicts();
+  }, []);
+
   return {
     isSyncing: syncState.isSyncing,
     lastSyncedAt: syncState.lastSyncedAt,
@@ -24,5 +28,6 @@ export const useSync = () => {
     conflicts: syncState.conflicts,
     syncNow,
     resolveConflicts,
+    cancelConflicts,
   };
 };

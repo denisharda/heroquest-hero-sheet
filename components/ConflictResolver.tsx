@@ -15,11 +15,13 @@ import { HERO_CLASSES } from '@/data/heroes';
 interface ConflictResolverProps {
   conflicts: HeroConflict[];
   onResolve: (resolutions: Map<string, 'local' | 'remote'>) => void;
+  onCancel?: () => void;
 }
 
 export const ConflictResolver: React.FC<ConflictResolverProps> = ({
   conflicts,
   onResolve,
+  onCancel,
 }) => {
   const { theme } = useTheme();
   const [choices, setChoices] = useState<Map<string, 'local' | 'remote'>>(new Map());
@@ -57,9 +59,16 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
     <Modal visible transparent animationType="slide">
       <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            Sync Conflict
-          </Text>
+          <View style={styles.titleRow}>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              Sync Conflict
+            </Text>
+            {onCancel && (
+              <Pressable onPress={onCancel} style={styles.closeButton}>
+                <Ionicons name="close" size={24} color={theme.colors.textSecondary} />
+              </Pressable>
+            )}
+          </View>
           <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
             {conflicts.length === 1
               ? 'This hero has been changed both locally and in the cloud. Which version do you want to keep?'
@@ -172,11 +181,22 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
   title: {
     fontSize: 20,
     fontFamily: 'Cinzel_700Bold',
     textAlign: 'center',
-    marginBottom: 8,
+    flex: 1,
+  },
+  closeButton: {
+    padding: 4,
+    position: 'absolute',
+    right: 0,
   },
   subtitle: {
     fontSize: 14,
