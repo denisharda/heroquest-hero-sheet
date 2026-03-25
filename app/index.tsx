@@ -90,6 +90,10 @@ export default function CharacterSheet() {
             visible={showHeroSwitcher}
             onClose={() => setShowHeroSwitcher(false)}
           />
+          <ConflictResolver
+            conflicts={conflicts}
+            onResolve={resolveConflicts}
+          />
         </ImageBackground>
       );
     }
@@ -130,6 +134,10 @@ export default function CharacterSheet() {
         <HeroSwitcher
           visible={showHeroSwitcher}
           onClose={() => setShowHeroSwitcher(false)}
+        />
+        <ConflictResolver
+          conflicts={conflicts}
+          onResolve={resolveConflicts}
         />
       </View>
     );

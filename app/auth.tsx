@@ -56,10 +56,12 @@ export default function AuthScreen() {
       } else {
         await signInWithEmail(email.trim(), password);
       }
+      // Clear loading before navigating to avoid the loading overlay
+      // persisting on the Account view during the modal dismiss animation
+      setLoading(false);
       router.back();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
-    } finally {
       setLoading(false);
     }
   };

@@ -19,12 +19,22 @@ function SyncLifecycle() {
   const syncInitialized = useRef(false);
 
   useEffect(() => {
+    const initSync = async (userId: string) => {
+      try {
+        await syncService.init(userId);
+        await syncService.syncNow();
+      } catch (err) {
+        console.warn('Sync initialization failed:', err);
+        // Reset so retry is possible on next auth event
+        syncInitialized.current = false;
+      }
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         if (session?.user && !syncInitialized.current) {
           syncInitialized.current = true;
-          await syncService.init(session.user.id);
-          await syncService.syncNow();
+          await initSync(session.user.id);
         } else if (!session && syncInitialized.current) {
           syncInitialized.current = false;
           syncService.destroy();
@@ -36,8 +46,7 @@ function SyncLifecycle() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user && !syncInitialized.current) {
         syncInitialized.current = true;
-        await syncService.init(session.user.id);
-        await syncService.syncNow();
+        await initSync(session.user.id);
       }
     });
 
