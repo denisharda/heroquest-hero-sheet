@@ -9,9 +9,12 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
+import { useAuth } from '@/hooks/useAuth';
+import { useSync } from '@/hooks/useSync';
 import {
   HeroIdentity,
   StatBlock,
@@ -23,12 +26,16 @@ import {
   QuestProgress,
   HeroSwitcher,
   ThemeToggle,
+  ConflictResolver,
 } from '@/components';
 
 export default function CharacterSheet() {
   const { theme } = useTheme();
+  const router = useRouter();
   const { hero, createHero } = useHero();
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
+  const { isAuthenticated } = useAuth();
+  const { isSyncing, syncError, conflicts, resolveConflicts } = useSync();
   const [showHeroSwitcher, setShowHeroSwitcher] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -157,6 +164,19 @@ export default function CharacterSheet() {
           >
             <Ionicons name="people" size={22} color={theme.colors.text} />
           </Pressable>
+          <Pressable
+            style={[
+              styles.headerButton,
+              { backgroundColor: theme.colors.surface },
+            ]}
+            onPress={() => router.push('/auth')}
+          >
+            <Ionicons
+              name={isAuthenticated ? 'person-circle' : 'person-circle-outline'}
+              size={22}
+              color={isAuthenticated ? theme.colors.accent : theme.colors.text}
+            />
+          </Pressable>
           <ThemeToggle size={22} />
         </View>
       </View>
@@ -253,14 +273,32 @@ export default function CharacterSheet() {
 
         <View style={styles.savedIndicator}>
           <Ionicons
-            name="cloud-done"
+            name={
+              !isAuthenticated
+                ? 'save'
+                : isSyncing
+                  ? 'sync'
+                  : syncError
+                    ? 'cloud-offline'
+                    : 'cloud-done'
+            }
             size={16}
-            color={theme.colors.success}
+            color={
+              syncError
+                ? theme.colors.danger
+                : theme.colors.success
+            }
           />
           <Text
             style={[styles.savedText, { color: theme.colors.textSecondary }]}
           >
-            Auto-saved
+            {!isAuthenticated
+              ? 'Auto-saved'
+              : isSyncing
+                ? 'Syncing...'
+                : syncError
+                  ? 'Sync error'
+                  : 'Synced'}
           </Text>
         </View>
       </View>
@@ -268,6 +306,11 @@ export default function CharacterSheet() {
       <HeroSwitcher
         visible={showHeroSwitcher}
         onClose={() => setShowHeroSwitcher(false)}
+      />
+
+      <ConflictResolver
+        conflicts={conflicts}
+        onResolve={resolveConflicts}
       />
     </>
   );

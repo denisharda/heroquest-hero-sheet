@@ -84,6 +84,18 @@ export const StatBlock: React.FC = () => {
         breakdown={computedStats.moveDice === 1 ? 'Plate Mail' : undefined}
         color={SHARED_COLORS.moveIcon}
       />
+      <StatBox
+        icon={
+          <FontAwesome5
+            name="gem"
+            size={20}
+            color={theme.colors.mind}
+          />
+        }
+        label="MIND"
+        value={computedStats.maxMindPoints}
+        color={theme.colors.mind}
+      />
     </View>
   );
 };

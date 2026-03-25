@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,6 +11,47 @@ import {
   Cinzel_600SemiBold,
   Cinzel_700Bold,
 } from '@expo-google-fonts/cinzel';
+import { supabase } from '@/lib/supabase';
+import { syncService } from '@/services/syncService';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+
+function SyncLifecycle() {
+  const syncInitialized = useRef(false);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event: AuthChangeEvent, session: Session | null) => {
+        if (session?.user && !syncInitialized.current) {
+          syncInitialized.current = true;
+          await syncService.init(session.user.id);
+          await syncService.syncNow();
+        } else if (!session && syncInitialized.current) {
+          syncInitialized.current = false;
+          syncService.destroy();
+        }
+      }
+    );
+
+    // Check initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user && !syncInitialized.current) {
+        syncInitialized.current = true;
+        await syncService.init(session.user.id);
+        await syncService.syncNow();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      if (syncInitialized.current) {
+        syncService.destroy();
+        syncInitialized.current = false;
+      }
+    };
+  }, []);
+
+  return null;
+}
 
 function RootLayoutNav() {
   const { theme } = useTheme();
@@ -18,6 +59,7 @@ function RootLayoutNav() {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style={theme.isDark ? 'light' : 'dark'} />
+      <SyncLifecycle />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -28,6 +70,13 @@ function RootLayoutNav() {
         <Stack.Screen name="index" />
         <Stack.Screen
           name="heroes"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="auth"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',

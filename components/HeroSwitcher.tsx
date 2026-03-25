@@ -29,7 +29,7 @@ const SCHOOL_COLORS: Record<SpellSchool, string> = {
 // Spell school icons
 const SCHOOL_ICONS: Record<SpellSchool, string> = {
   Air: 'weather-windy',
-  Earth: 'mountain',
+  Earth: 'earth',
   Fire: 'fire',
   Water: 'water',
 };

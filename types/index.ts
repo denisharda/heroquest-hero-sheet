@@ -151,3 +151,25 @@ export interface Theme {
   isDark: boolean;
   backgroundTexture?: any; // ImageSourcePropType
 }
+
+// Auth
+export interface AuthUser {
+  id: string;
+  email: string | null;
+  provider: 'email' | 'google' | 'apple';
+}
+
+// Sync
+export interface HeroConflict {
+  heroId: string;
+  heroName: string;
+  local: Hero;
+  remote: Hero;
+}
+
+export interface SyncState {
+  isSyncing: boolean;
+  lastSyncedAt: number | null;
+  error: string | null;
+  conflicts: HeroConflict[];
+}

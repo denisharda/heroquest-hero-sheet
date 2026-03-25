@@ -51,6 +51,7 @@ interface HeroStore {
   // Heroes list
   heroes: Hero[];
   currentHeroId: string | null;
+  deletedHeroIds: string[];
 
   // Undo/Redo
   history: HistoryEntry[];
@@ -96,6 +97,10 @@ interface HeroStore {
   canUndo: () => boolean;
   canRedo: () => boolean;
 
+  // Actions - Sync
+  clearDeletedHeroIds: () => void;
+  mergeHeroes: (heroes: Hero[]) => void;
+
   // Helpers
   getCurrentHero: () => Hero | null;
 }
@@ -133,6 +138,7 @@ export const useHeroStore = create<HeroStore>()(
     (set, get) => ({
       heroes: [],
       currentHeroId: null,
+      deletedHeroIds: [],
       history: [],
       historyIndex: -1,
 
@@ -156,6 +162,7 @@ export const useHeroStore = create<HeroStore>()(
           return {
             heroes: newHeroes,
             currentHeroId: newCurrentId,
+            deletedHeroIds: [...state.deletedHeroIds, heroId],
             history: newCurrentId !== state.currentHeroId ? [] : state.history,
             historyIndex: newCurrentId !== state.currentHeroId ? -1 : state.historyIndex,
           };
@@ -661,6 +668,27 @@ export const useHeroStore = create<HeroStore>()(
         return historyIndex < history.length - 1;
       },
 
+      // Sync
+      clearDeletedHeroIds: () => {
+        set({ deletedHeroIds: [] });
+      },
+
+      mergeHeroes: (mergedHeroes) => {
+        set((state) => {
+          // Preserve currentHeroId if the hero still exists in merged set
+          const currentStillExists = mergedHeroes.some((h) => h.id === state.currentHeroId);
+          return {
+            heroes: mergedHeroes,
+            currentHeroId: currentStillExists
+              ? state.currentHeroId
+              : (mergedHeroes.length > 0 ? mergedHeroes[0].id : null),
+            // Reset undo history to prevent stale references
+            history: [],
+            historyIndex: -1,
+          };
+        });
+      },
+
       // Helpers
       getCurrentHero: () => {
         const { heroes, currentHeroId } = get();
@@ -670,21 +698,20 @@ export const useHeroStore = create<HeroStore>()(
     }),
     {
       name: 'heroquest-heroes',
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         heroes: state.heroes,
         currentHeroId: state.currentHeroId,
+        deletedHeroIds: state.deletedHeroIds,
       }),
       migrate: (persistedState: unknown, version: number) => {
-        const state = persistedState as { heroes: Hero[]; currentHeroId: string | null };
+        const state = persistedState as { heroes: Hero[]; currentHeroId: string | null; deletedHeroIds?: string[] };
 
         // Migration from version 0 (no version) to version 1
         if (version === 0) {
-          // Ensure all heroes have required fields with defaults
           const migratedHeroes = state.heroes.map((hero: Hero) => ({
             ...hero,
-            // Add any missing fields with defaults
             inventory: hero.inventory ?? [],
             questsCompleted: hero.questsCompleted ?? [],
             createdAt: hero.createdAt ?? Date.now(),
@@ -694,11 +721,17 @@ export const useHeroStore = create<HeroStore>()(
           return {
             ...state,
             heroes: migratedHeroes,
+            deletedHeroIds: [],
           };
         }
 
-        // Future migrations can be added here:
-        // if (version === 1) { ... migrate to version 2 ... }
+        // Migration from version 1 to version 2: add deletedHeroIds
+        if (version === 1) {
+          return {
+            ...state,
+            deletedHeroIds: [],
+          };
+        }
 
         return state;
       },

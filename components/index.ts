@@ -9,3 +9,4 @@ export { QuestProgress } from './QuestProgress';
 export { HeroSwitcher } from './HeroSwitcher';
 export { ThemeToggle } from './ThemeToggle';
 export { PlaceholderPortrait } from './PlaceholderPortrait';
+export { ConflictResolver } from './ConflictResolver';

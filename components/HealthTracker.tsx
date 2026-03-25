@@ -107,7 +107,7 @@ const PointTracker: React.FC<PointTrackerProps> = ({
 
 export const HealthTracker: React.FC = () => {
   const { theme } = useTheme();
-  const { hero, computedStats, adjustBodyPoints, adjustMindPoints } = useHero();
+  const { hero, computedStats, adjustBodyPoints } = useHero();
 
   if (!hero || !computedStats) return null;
 
@@ -122,16 +122,6 @@ export const HealthTracker: React.FC = () => {
         icon="heart"
         onTap={() => adjustBodyPoints(-1)}
         onLongPress={() => adjustBodyPoints(1)}
-      />
-      <PointTracker
-        label="MIND POINTS"
-        current={hero.currentMindPoints}
-        max={computedStats.maxMindPoints}
-        filledColor={theme.colors.mind}
-        emptyColor={theme.colors.mindEmpty}
-        icon="gem"
-        onTap={() => adjustMindPoints(-1)}
-        onLongPress={() => adjustMindPoints(1)}
       />
     </View>
   );
