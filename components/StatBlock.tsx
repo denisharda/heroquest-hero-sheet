@@ -81,7 +81,7 @@ export const StatBlock: React.FC = () => {
         }
         label="MOVE"
         value={`${computedStats.moveDice}d6`}
-        breakdown={computedStats.moveDice === 1 ? 'Plate Mail' : undefined}
+        breakdown={computedStats.moveBreakdown}
         color={SHARED_COLORS.moveIcon}
       />
       <StatBox
@@ -94,6 +94,7 @@ export const StatBlock: React.FC = () => {
         }
         label="MIND"
         value={computedStats.maxMindPoints}
+        breakdown={computedStats.mindBreakdown}
         color={theme.colors.mind}
       />
     </View>

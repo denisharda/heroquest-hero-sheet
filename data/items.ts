@@ -1,4 +1,4 @@
-import { Item, ItemCategory } from '@/types';
+import { Item, ItemCategory, ArtifactEffect } from '@/types';
 
 // Base item definitions (quantity will be set when added to inventory)
 interface ItemDefinition {
@@ -148,6 +148,17 @@ export const getItemById = (id: string): ItemDefinition | undefined => {
 
 export const getItemsByCategory = (category: ItemCategory): ItemDefinition[] => {
   return ITEM_DEFINITIONS.filter(i => i.category === category);
+};
+
+// Artifact passive stat effects (looked up at computation time)
+export const ARTIFACT_EFFECTS: Record<string, ArtifactEffect> = {
+  'talisman-of-lore': { bonusMindPoints: 1 },
+  'wizards-cloak': { bonusDefendDice: 1, allowedClasses: ['Wizard'] },
+  'borins-armor': {
+    overrideArmorDefend: 4,
+    negatesMovementPenalty: true,
+    allowedClasses: ['Barbarian', 'Dwarf', 'Elf'],
+  },
 };
 
 // Only show purchasable items (not artifacts)

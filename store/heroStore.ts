@@ -5,8 +5,23 @@ import { Hero, HeroClassName, Equipment, Spell, Item, HistoryEntry, Weapon, Shie
 import { HERO_CLASSES } from '@/data/heroes';
 import { createSpellsFromSchools } from '@/data/spells';
 import { getStartingWeapon } from '@/data/weapons';
+import { ARTIFACT_EFFECTS } from '@/data/items';
 
 const MAX_HISTORY_SIZE = 50;
+
+// Compute max mind points accounting for artifact bonuses in inventory
+const getMaxMindPoints = (hero: Hero): number => {
+  const classStats = HERO_CLASSES[hero.heroClass];
+  let maxMP = classStats.mindPoints;
+  for (const item of hero.inventory) {
+    if (item.category !== 'artifact') continue;
+    const effect = ARTIFACT_EFFECTS[item.id];
+    if (!effect?.bonusMindPoints) continue;
+    if (effect.allowedClasses && !effect.allowedClasses.includes(hero.heroClass)) continue;
+    maxMP += effect.bonusMindPoints;
+  }
+  return maxMP;
+};
 
 // Generate unique ID
 const generateId = (): string => {
@@ -244,8 +259,8 @@ export const useHeroStore = create<HeroStore>()(
         if (heroIndex === -1) return;
 
         const oldHero = heroes[heroIndex];
-        const classStats = HERO_CLASSES[oldHero.heroClass];
-        const clampedPoints = Math.max(0, Math.min(points, classStats.mindPoints));
+        const maxMP = getMaxMindPoints(oldHero);
+        const clampedPoints = Math.max(0, Math.min(points, maxMP));
 
         const updatedHero = {
           ...oldHero,
@@ -266,8 +281,8 @@ export const useHeroStore = create<HeroStore>()(
       adjustMindPoints: (delta) => {
         const hero = get().getCurrentHero();
         if (!hero) return;
-        const classStats = HERO_CLASSES[hero.heroClass];
-        const newPoints = Math.max(0, Math.min(hero.currentMindPoints + delta, classStats.mindPoints));
+        const maxMP = getMaxMindPoints(hero);
+        const newPoints = Math.max(0, Math.min(hero.currentMindPoints + delta, maxMP));
         get().setMindPoints(newPoints);
       },
 
@@ -536,9 +551,15 @@ export const useHeroStore = create<HeroStore>()(
         const oldHero = heroes[heroIndex];
         const newInventory = oldHero.inventory.filter((i) => i.id !== itemId);
 
+        // Clamp mind points if removing an artifact that boosted max MP
+        const tempHero = { ...oldHero, inventory: newInventory };
+        const newMaxMP = getMaxMindPoints(tempHero);
+        const clampedMindPoints = Math.min(oldHero.currentMindPoints, newMaxMP);
+
         const updatedHero = {
           ...oldHero,
           inventory: newInventory,
+          currentMindPoints: clampedMindPoints,
           updatedAt: Date.now(),
         };
 

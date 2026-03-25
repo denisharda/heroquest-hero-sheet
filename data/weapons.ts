@@ -180,7 +180,29 @@ export const WEAPONS: Weapon[] = [
     description: 'Maximum melee power. Two-handed. Cannot be used by Wizards. (Expansion)',
   },
 
-  // Artifact Weapon
+  // Artifact Weapons
+  {
+    id: 'orcs-bane',
+    name: "Orc's Bane",
+    attackDice: 2,
+    diagonalAttack: false,
+    twoHanded: false,
+    goldCost: 0,
+    isArtifact: true,
+    restrictedClasses: ['Wizard'],
+    description: "Roll 2 combat dice to attack. You may attack twice if attacking an Orc. Artifact from Quest 11.",
+  },
+  {
+    id: 'wizards-staff',
+    name: "Wizard's Staff",
+    attackDice: 2,
+    diagonalAttack: true,
+    twoHanded: true,
+    goldCost: 0,
+    isArtifact: true,
+    restrictedClasses: ['Barbarian', 'Dwarf', 'Elf'],
+    description: "This ancient staff glows with a soft blue light. Roll 2 combat dice to attack, with diagonal strike. Wizard only. Artifact from Quest 12.",
+  },
   {
     id: 'spirit-blade',
     name: 'Spirit Blade',

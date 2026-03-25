@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useHeroStore } from '@/store/heroStore';
 import { HERO_CLASSES } from '@/data/heroes';
+import { ARTIFACT_EFFECTS } from '@/data/items';
 import { ComputedStats, Hero } from '@/types';
 
 export const useHero = () => {
@@ -28,32 +29,91 @@ export const useHero = () => {
     const shieldDefend = equipment.shield?.defendDice ?? 0;
     const helmetDefend = equipment.helmet?.defendDice ?? 0;
     const armorDefend = equipment.armor?.defendDice ?? 0;
-    const totalDefend = baseDefend + shieldDefend + helmetDefend + armorDefend;
 
-    // Build defense breakdown
+    // Scan inventory for artifact stat effects
+    let artifactDefendBonus = 0;
+    let artifactMindBonus = 0;
+    let hasArmorOverride = false;
+    let armorOverrideValue = 0;
+    let artifactNegatesMovePenalty = false;
+    const artifactDefendParts: string[] = [];
+    const artifactMindParts: string[] = [];
+
+    for (const item of hero.inventory) {
+      if (item.category !== 'artifact') continue;
+      const effect = ARTIFACT_EFFECTS[item.id];
+      if (!effect) continue;
+      if (effect.allowedClasses && !effect.allowedClasses.includes(hero.heroClass)) continue;
+
+      if (effect.bonusMindPoints) {
+        artifactMindBonus += effect.bonusMindPoints;
+        artifactMindParts.push(`${effect.bonusMindPoints} (${item.name})`);
+      }
+      if (effect.bonusDefendDice) {
+        artifactDefendBonus += effect.bonusDefendDice;
+        artifactDefendParts.push(`${effect.bonusDefendDice} (${item.name})`);
+      }
+      if (effect.overrideArmorDefend !== undefined) {
+        hasArmorOverride = true;
+        armorOverrideValue = effect.overrideArmorDefend;
+      }
+      if (effect.negatesMovementPenalty) {
+        artifactNegatesMovePenalty = true;
+      }
+    }
+
+    // Build defense with artifact effects
     const defendParts: string[] = [`${baseDefend} (base)`];
-    if (equipment.shield) {
-      defendParts.push(`${shieldDefend} (${equipment.shield.name})`);
+    let totalDefend: number;
+
+    if (hasArmorOverride) {
+      // Borin's Armor: "roll four combat dice in defense" = 4 total base defense
+      // This replaces base + armor, but shield/helmet still stack
+      const borinsContribution = armorOverrideValue - baseDefend;
+      defendParts.push(`${borinsContribution} (Borin's Armor)`);
+      if (equipment.shield) defendParts.push(`${shieldDefend} (${equipment.shield.name})`);
+      if (equipment.helmet) defendParts.push(`${helmetDefend} (${equipment.helmet.name})`);
+      totalDefend = armorOverrideValue + shieldDefend + helmetDefend + artifactDefendBonus;
+    } else {
+      if (equipment.shield) defendParts.push(`${shieldDefend} (${equipment.shield.name})`);
+      if (equipment.helmet) defendParts.push(`${helmetDefend} (${equipment.helmet.name})`);
+      if (equipment.armor) defendParts.push(`${armorDefend} (${equipment.armor.name})`);
+      totalDefend = baseDefend + shieldDefend + helmetDefend + armorDefend + artifactDefendBonus;
     }
-    if (equipment.helmet) {
-      defendParts.push(`${helmetDefend} (${equipment.helmet.name})`);
-    }
-    if (equipment.armor) {
-      defendParts.push(`${armorDefend} (${equipment.armor.name})`);
+    for (const part of artifactDefendParts) {
+      defendParts.push(part);
     }
     const defendBreakdown = defendParts.join(' + ');
 
-    // Calculate movement dice (Plate Mail reduces to 1d6)
-    const moveDice = equipment.armor?.movementPenalty ? 1 : classStats.baseMove;
+    // Calculate movement dice (Plate Mail reduces to 1d6, but Borin's Armor negates penalty)
+    const moveDice = (equipment.armor?.movementPenalty && !artifactNegatesMovePenalty)
+      ? 1
+      : classStats.baseMove;
+
+    // Movement breakdown
+    let moveBreakdown: string | undefined;
+    if (equipment.armor?.movementPenalty && !artifactNegatesMovePenalty) {
+      moveBreakdown = 'Plate Mail';
+    } else if (equipment.armor?.movementPenalty && artifactNegatesMovePenalty) {
+      moveBreakdown = "Borin's Armor negates penalty";
+    }
+
+    // Mind points with artifact bonus
+    const maxMindPoints = classStats.mindPoints + artifactMindBonus;
+    const mindBreakdown = artifactMindParts.length > 0
+      ? `${classStats.mindPoints} (base) + ${artifactMindParts.join(' + ')}`
+      : undefined;
 
     return {
       totalAttack,
       totalDefend,
       moveDice,
       maxBodyPoints: classStats.bodyPoints,
-      maxMindPoints: classStats.mindPoints,
+      maxMindPoints: maxMindPoints,
       attackBreakdown,
       defendBreakdown,
+      moveBreakdown,
+      mindBreakdown,
     };
   }, [hero]);
 

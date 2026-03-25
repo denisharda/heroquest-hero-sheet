@@ -82,7 +82,17 @@ export const EquipmentSelector: React.FC = () => {
         const available = getAvailableWeapons(hero.heroClass);
         // Remove starting weapon from the list if present (it will be first)
         const filtered = available.filter((w) => w.id !== startingWeapon?.id);
-        return startingWeapon ? [startingWeapon, ...filtered] : available;
+        const base = startingWeapon ? [startingWeapon, ...filtered] : available;
+        // Include artifact weapons the hero has in inventory
+        const inventoryArtifactWeaponIds = hero.inventory
+          .filter((i) => i.category === 'artifact')
+          .map((i) => i.id);
+        const artifactWeapons = WEAPONS.filter(
+          (w) => w.isArtifact
+            && inventoryArtifactWeaponIds.includes(w.id)
+            && (!w.restrictedClasses || !w.restrictedClasses.includes(hero.heroClass))
+        );
+        return [...base, ...artifactWeapons];
       }
       case 'shield':
         return [NO_SHIELD, ...getAvailableShields(hero.heroClass)];

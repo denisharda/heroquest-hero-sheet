@@ -1,3 +1,12 @@
+// Artifact Effects
+export interface ArtifactEffect {
+  bonusMindPoints?: number;
+  bonusDefendDice?: number;
+  overrideArmorDefend?: number;
+  negatesMovementPenalty?: boolean;
+  allowedClasses?: HeroClassName[];
+}
+
 // Hero Classes
 export type HeroClassName = 'Barbarian' | 'Dwarf' | 'Elf' | 'Wizard';
 
@@ -113,6 +122,8 @@ export interface ComputedStats {
   maxMindPoints: number;
   attackBreakdown: string;
   defendBreakdown: string;
+  moveBreakdown?: string;
+  mindBreakdown?: string;
 }
 
 // Undo/Redo
