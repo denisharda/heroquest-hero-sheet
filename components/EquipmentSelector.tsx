@@ -11,7 +11,7 @@ import {
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { getAvailableWeapons, NO_WEAPON, WEAPONS } from '@/data/weapons';
+import { getAvailableWeapons, getStartingWeapon, WEAPONS } from '@/data/weapons';
 import { getAvailableShields, NO_SHIELD, getAvailableHelmets, NO_HELMET, getAvailableArmor, NO_ARMOR } from '@/data/armor';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
@@ -77,8 +77,13 @@ export const EquipmentSelector: React.FC = () => {
 
   const getItemsForSlot = (): EquipmentItem[] => {
     switch (selectedSlot) {
-      case 'weapon':
-        return [NO_WEAPON, ...getAvailableWeapons(hero.heroClass)];
+      case 'weapon': {
+        const startingWeapon = getStartingWeapon(hero.heroClass);
+        const available = getAvailableWeapons(hero.heroClass);
+        // Remove starting weapon from the list if present (it will be first)
+        const filtered = available.filter((w) => w.id !== startingWeapon?.id);
+        return startingWeapon ? [startingWeapon, ...filtered] : available;
+      }
       case 'shield':
         return [NO_SHIELD, ...getAvailableShields(hero.heroClass)];
       case 'helmet':
@@ -94,7 +99,7 @@ export const EquipmentSelector: React.FC = () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     switch (selectedSlot) {
       case 'weapon':
-        equipWeapon(item.id === 'none' ? null : (item as Weapon));
+        equipWeapon(item as Weapon);
         break;
       case 'shield':
         equipShield(item.id === 'none' ? null : (item as Shield));
