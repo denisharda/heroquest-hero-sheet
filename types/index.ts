@@ -1,5 +1,6 @@
 // Artifact Effects
 export interface ArtifactEffect {
+  bonusBodyPoints?: number;
   bonusMindPoints?: number;
   bonusDefendDice?: number;
   overrideArmorDefend?: number;
@@ -123,6 +124,7 @@ export interface ComputedStats {
   attackBreakdown: string;
   defendBreakdown: string;
   moveBreakdown?: string;
+  bodyBreakdown?: string;
   mindBreakdown?: string;
 }
 

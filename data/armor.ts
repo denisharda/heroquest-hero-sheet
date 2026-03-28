@@ -76,7 +76,7 @@ export const ARMOR: Armor[] = [
     defendDice: 1,
     goldCost: 500,
     restrictedClasses: ['Wizard'],
-    description: 'Adds +1 defense die. Interlocking metal rings. Cannot be used by Wizards.',
+    description: 'This light metal armor gives you 1 extra Defend die. May be combined with the helmet and/or shield. May not be worn by the wizard.',
   },
   {
     id: 'plate-mail',
@@ -85,7 +85,14 @@ export const ARMOR: Armor[] = [
     goldCost: 850,
     restrictedClasses: ['Wizard'],
     movementPenalty: true,
-    description: 'Adds +2 defense dice, but movement is reduced to 1d6. Cannot be used by Wizards.',
+    description: 'This heavy metal armor gives you 2 extra Defend dice. However, because it is so heavy, you may only roll 1 red die for movement while wearing it. May be combined with the helmet and/or shield. May not be worn by the wizard.',
+  },
+  {
+    id: 'bracers',
+    name: 'Bracers',
+    defendDice: 1,
+    goldCost: 550,
+    description: 'These hardened leather bracers give you 1 extra Defend die. May be combined with the helmet and/or shield.',
   },
 ];
 

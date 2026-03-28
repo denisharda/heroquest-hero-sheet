@@ -14,19 +14,19 @@ export const SPELL_DEFINITIONS: SpellDefinition[] = [
     id: 'genie',
     name: 'Genie',
     school: 'Air',
-    description: 'Summons a powerful Genie to assist the party. The Genie acts as an additional hero with its own movement and combat abilities. It can attack monsters and defend other heroes. The Genie remains until the end of the quest or until destroyed.',
+    description: 'This spell conjures up a genie who does one of the following: opens any door on the board (revealing what lies beyond) or uses 5 combat dice to attack any monster within your line of sight.',
   },
   {
     id: 'swift-wind',
     name: 'Swift Wind',
     school: 'Air',
-    description: 'Cast on any hero (including yourself). The target may immediately move up to 6 additional squares. This movement ignores the normal movement roll and can be used to escape dangerous situations or reach distant objectives quickly.',
+    description: 'This spell may be cast on any one hero, including yourself. Its powerful burst of energy enables that hero to roll twice as many red dice as normal the next time they move.',
   },
   {
     id: 'tempest',
     name: 'Tempest',
     school: 'Air',
-    description: 'Unleashes a powerful wind attack that affects all monsters in a straight line from the caster. Roll 3 combat dice for each monster hit. Each skull rolled deals 1 Body Point of damage. Monsters cannot defend against this attack.',
+    description: 'This spell creates a small whirlwind that envelops one monster of your choice. That monster then misses its next turn.',
   },
 
   // Earth Spells
@@ -34,19 +34,19 @@ export const SPELL_DEFINITIONS: SpellDefinition[] = [
     id: 'heal-body',
     name: 'Heal Body',
     school: 'Earth',
-    description: 'Cast on any hero (including yourself). Restores up to 4 lost Body Points to the target. The hero cannot exceed their maximum Body Points. One of the most valuable spells for keeping the party alive during difficult quests.',
+    description: 'This spell may be cast on any one hero, including yourself. Its magical power immediately restores up to 4 lost Body Points, but does not give a hero more than their starting number.',
   },
   {
     id: 'pass-through-rock',
     name: 'Pass Through Rock',
     school: 'Earth',
-    description: 'Cast on any hero (including yourself). For the duration of this turn, the target may move through walls and blocked squares as if they were open. The hero must end their movement on a valid, unoccupied square.',
+    description: 'This spell may be cast on any one hero, including yourself. That hero may then move through walls on their next move. They may move through as many walls as their dice roll allows. Caution! There are shaded areas on each quest map that indicate solid rock. If a hero ends their move in one of these areas, they are trapped forever!',
   },
   {
     id: 'rock-skin',
     name: 'Rock Skin',
     school: 'Earth',
-    description: 'Cast on any hero (including yourself). The target gains +2 additional Defend dice until the end of the quest. This bonus stacks with armor and shields. An excellent defensive spell for protecting vulnerable party members.',
+    description: 'This spell may be cast on any one hero, including yourself. That hero may throw 1 extra combat die when defending. The spell is broken when the hero suffers 1 Body Point of damage.',
   },
 
   // Fire Spells
@@ -54,19 +54,19 @@ export const SPELL_DEFINITIONS: SpellDefinition[] = [
     id: 'ball-of-flame',
     name: 'Ball of Flame',
     school: 'Fire',
-    description: 'Hurls a ball of magical fire at any visible monster. Roll 2 combat dice. Each skull rolled deals 1 Body Point of damage. The target monster cannot defend against this magical attack. Requires line of sight to the target.',
+    description: 'This spell may be cast on any one monster, enveloping it in a ball of fire. It inflicts 2 Body Points of damage. The monster then rolls 2 red dice. For each 5 or 6 rolled, the damage is reduced by 1 point.',
   },
   {
     id: 'courage',
     name: 'Courage',
     school: 'Fire',
-    description: 'Cast on any hero (including yourself). Removes all fear effects and prevents the target from being affected by fear for the rest of the quest. Also grants +1 Attack die until the end of the quest. Can counter certain Dread spells.',
+    description: 'This spell may be cast on any one hero, including yourself. The next time that hero attacks, they may roll 2 extra combat dice. The spell is broken the moment a monster is no longer in the hero\'s line of sight.',
   },
   {
     id: 'fire-of-wrath',
     name: 'Fire of Wrath',
     school: 'Fire',
-    description: 'The most powerful offensive spell. Cast on any visible monster. Roll 4 combat dice. Each skull rolled deals 1 Body Point of damage. The target cannot defend. This spell can destroy most monsters in a single casting.',
+    description: 'This spell may be cast on any one monster, blasting it with flames. It inflicts 1 Body Point of damage, unless the monster can immediately roll a 5 or 6 using 1 red die.',
   },
 
   // Water Spells
@@ -74,19 +74,19 @@ export const SPELL_DEFINITIONS: SpellDefinition[] = [
     id: 'sleep',
     name: 'Sleep',
     school: 'Water',
-    description: 'Cast on any visible monster. The target falls into a deep magical sleep and cannot move, attack, or defend until it is attacked or the quest ends. Sleeping monsters are automatically hit (no attack roll needed) and cannot defend.',
+    description: 'This spell puts a monster into a deep sleep so it cannot move, attack, or defend itself. The spell can be broken at once or on a future turn by a monster rolling 1 red die for each of its Mind Points. If a 6 is rolled, the spell is broken. May not be used against mummies, zombies, or skeletons.',
   },
   {
     id: 'veil-of-mist',
     name: 'Veil of Mist',
     school: 'Water',
-    description: 'Cast on any hero (including yourself). Creates a protective veil of magical mist around the target. Until the end of the quest, monsters must roll 1 fewer Attack die when attacking this hero (minimum 1 die).',
+    description: 'This spell may be cast on any one hero, including yourself. On the hero\'s next move, they may move unseen through spaces that are occupied by monsters.',
   },
   {
     id: 'water-of-healing',
     name: 'Water of Healing',
     school: 'Water',
-    description: 'Cast on any hero (including yourself). Summons magical healing waters that restore up to 2 lost Body Points to the target. The hero cannot exceed their maximum Body Points. A weaker but still useful healing spell.',
+    description: 'This spell may be cast on any one hero, including yourself. Contact with this revitalizing water restores up to 4 lost Body Points but does not give a hero more than their starting number.',
   },
 ];
 

@@ -31,11 +31,13 @@ export const useHero = () => {
     const armorDefend = equipment.armor?.defendDice ?? 0;
 
     // Scan inventory for artifact stat effects
+    let artifactBodyBonus = 0;
     let artifactDefendBonus = 0;
     let artifactMindBonus = 0;
     let hasArmorOverride = false;
     let armorOverrideValue = 0;
     let artifactNegatesMovePenalty = false;
+    const artifactBodyParts: string[] = [];
     const artifactDefendParts: string[] = [];
     const artifactMindParts: string[] = [];
 
@@ -45,6 +47,10 @@ export const useHero = () => {
       if (!effect) continue;
       if (effect.allowedClasses && !effect.allowedClasses.includes(hero.heroClass)) continue;
 
+      if (effect.bonusBodyPoints) {
+        artifactBodyBonus += effect.bonusBodyPoints;
+        artifactBodyParts.push(`${effect.bonusBodyPoints} (${item.name})`);
+      }
       if (effect.bonusMindPoints) {
         artifactMindBonus += effect.bonusMindPoints;
         artifactMindParts.push(`${effect.bonusMindPoints} (${item.name})`);
@@ -98,6 +104,12 @@ export const useHero = () => {
       moveBreakdown = "Borin's Armor negates penalty";
     }
 
+    // Body points with artifact bonus
+    const maxBodyPoints = classStats.bodyPoints + artifactBodyBonus;
+    const bodyBreakdown = artifactBodyParts.length > 0
+      ? `${classStats.bodyPoints} (base) + ${artifactBodyParts.join(' + ')}`
+      : undefined;
+
     // Mind points with artifact bonus
     const maxMindPoints = classStats.mindPoints + artifactMindBonus;
     const mindBreakdown = artifactMindParts.length > 0
@@ -108,11 +120,12 @@ export const useHero = () => {
       totalAttack,
       totalDefend,
       moveDice,
-      maxBodyPoints: classStats.bodyPoints,
-      maxMindPoints: maxMindPoints,
+      maxBodyPoints,
+      maxMindPoints,
       attackBreakdown,
       defendBreakdown,
       moveBreakdown,
+      bodyBreakdown,
       mindBreakdown,
     };
   }, [hero]);

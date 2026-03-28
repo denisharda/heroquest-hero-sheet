@@ -9,6 +9,20 @@ import { ARTIFACT_EFFECTS } from '@/data/items';
 
 const MAX_HISTORY_SIZE = 50;
 
+// Compute max body points accounting for artifact bonuses in inventory
+const getMaxBodyPoints = (hero: Hero): number => {
+  const classStats = HERO_CLASSES[hero.heroClass];
+  let maxBP = classStats.bodyPoints;
+  for (const item of hero.inventory) {
+    if (item.category !== 'artifact') continue;
+    const effect = ARTIFACT_EFFECTS[item.id];
+    if (!effect?.bonusBodyPoints) continue;
+    if (effect.allowedClasses && !effect.allowedClasses.includes(hero.heroClass)) continue;
+    maxBP += effect.bonusBodyPoints;
+  }
+  return maxBP;
+};
+
 // Compute max mind points accounting for artifact bonuses in inventory
 const getMaxMindPoints = (hero: Hero): number => {
   const classStats = HERO_CLASSES[hero.heroClass];
@@ -224,8 +238,8 @@ export const useHeroStore = create<HeroStore>()(
         if (heroIndex === -1) return;
 
         const oldHero = heroes[heroIndex];
-        const classStats = HERO_CLASSES[oldHero.heroClass];
-        const clampedPoints = Math.max(0, Math.min(points, classStats.bodyPoints));
+        const maxBP = getMaxBodyPoints(oldHero);
+        const clampedPoints = Math.max(0, Math.min(points, maxBP));
 
         const updatedHero = {
           ...oldHero,
@@ -246,8 +260,8 @@ export const useHeroStore = create<HeroStore>()(
       adjustBodyPoints: (delta) => {
         const hero = get().getCurrentHero();
         if (!hero) return;
-        const classStats = HERO_CLASSES[hero.heroClass];
-        const newPoints = Math.max(0, Math.min(hero.currentBodyPoints + delta, classStats.bodyPoints));
+        const maxBP = getMaxBodyPoints(hero);
+        const newPoints = Math.max(0, Math.min(hero.currentBodyPoints + delta, maxBP));
         get().setBodyPoints(newPoints);
       },
 
@@ -551,14 +565,17 @@ export const useHeroStore = create<HeroStore>()(
         const oldHero = heroes[heroIndex];
         const newInventory = oldHero.inventory.filter((i) => i.id !== itemId);
 
-        // Clamp mind points if removing an artifact that boosted max MP
+        // Clamp body/mind points if removing an artifact that boosted max
         const tempHero = { ...oldHero, inventory: newInventory };
+        const newMaxBP = getMaxBodyPoints(tempHero);
+        const clampedBodyPoints = Math.min(oldHero.currentBodyPoints, newMaxBP);
         const newMaxMP = getMaxMindPoints(tempHero);
         const clampedMindPoints = Math.min(oldHero.currentMindPoints, newMaxMP);
 
         const updatedHero = {
           ...oldHero,
           inventory: newInventory,
+          currentBodyPoints: clampedBodyPoints,
           currentMindPoints: clampedMindPoints,
           updatedAt: Date.now(),
         };
