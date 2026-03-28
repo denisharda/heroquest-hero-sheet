@@ -50,6 +50,77 @@ export default function CharacterSheet() {
   const hasTexture = !!theme.backgroundTexture;
 
   if (!hero) {
+    const emptyContent = (
+      <>
+        <View style={styles.emptyStateContainer}>
+          <MaterialCommunityIcons
+            name="sword-cross"
+            size={80}
+            color={theme.colors.textSecondary}
+          />
+          <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+            Welcome, Adventurer!
+          </Text>
+          <Text
+            style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
+          >
+            {isAuthenticated
+              ? 'Create your first hero to begin your quest'
+              : 'Sign in to load your heroes from the cloud, or start fresh'}
+          </Text>
+
+          {!isAuthenticated && (
+            <Pressable
+              style={[styles.createButton, { backgroundColor: theme.colors.accent }]}
+              onPress={() => router.push('/auth')}
+            >
+              <Ionicons name="cloud-download-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.createButtonText}>Sign In</Text>
+            </Pressable>
+          )}
+
+          <Pressable
+            style={[
+              styles.createButton,
+              {
+                backgroundColor: isAuthenticated
+                  ? theme.colors.accent
+                  : 'transparent',
+                borderWidth: isAuthenticated ? 0 : 2,
+                borderColor: theme.colors.accent,
+                marginTop: isAuthenticated ? 0 : 16,
+              },
+            ]}
+            onPress={() => setShowHeroSwitcher(true)}
+          >
+            <Ionicons
+              name="add"
+              size={24}
+              color={isAuthenticated ? '#FFFFFF' : theme.colors.accent}
+            />
+            <Text
+              style={[
+                styles.createButtonText,
+                { color: isAuthenticated ? '#FFFFFF' : theme.colors.accent },
+              ]}
+            >
+              {isAuthenticated ? 'Create Hero' : 'Continue as Guest'}
+            </Text>
+          </Pressable>
+        </View>
+
+        <HeroSwitcher
+          visible={showHeroSwitcher}
+          onClose={() => setShowHeroSwitcher(false)}
+        />
+        <ConflictResolver
+          conflicts={conflicts}
+          onResolve={resolveConflicts}
+          onCancel={cancelConflicts}
+        />
+      </>
+    );
+
     if (hasTexture) {
       return (
         <ImageBackground
@@ -64,40 +135,11 @@ export default function CharacterSheet() {
             },
           ]}
         >
-          <View style={styles.emptyStateContainer}>
-            <MaterialCommunityIcons
-              name="sword-cross"
-              size={80}
-              color={theme.colors.textSecondary}
-            />
-            <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-              Welcome, Adventurer!
-            </Text>
-            <Text
-              style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
-            >
-              Create your first hero to begin your quest
-            </Text>
-            <Pressable
-              style={[styles.createButton, { backgroundColor: theme.colors.accent }]}
-              onPress={() => setShowHeroSwitcher(true)}
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
-              <Text style={styles.createButtonText}>Create Hero</Text>
-            </Pressable>
-          </View>
-          <HeroSwitcher
-            visible={showHeroSwitcher}
-            onClose={() => setShowHeroSwitcher(false)}
-          />
-          <ConflictResolver
-            conflicts={conflicts}
-            onResolve={resolveConflicts}
-            onCancel={cancelConflicts}
-          />
+          {emptyContent}
         </ImageBackground>
       );
     }
+
     return (
       <View
         style={[
@@ -109,37 +151,7 @@ export default function CharacterSheet() {
           },
         ]}
       >
-        <View style={styles.emptyStateContainer}>
-          <MaterialCommunityIcons
-            name="sword-cross"
-            size={80}
-            color={theme.colors.textSecondary}
-          />
-          <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-            Welcome, Adventurer!
-          </Text>
-          <Text
-            style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
-          >
-            Create your first hero to begin your quest
-          </Text>
-          <Pressable
-            style={[styles.createButton, { backgroundColor: theme.colors.accent }]}
-            onPress={() => setShowHeroSwitcher(true)}
-          >
-            <Ionicons name="add" size={24} color="#FFFFFF" />
-            <Text style={styles.createButtonText}>Create Hero</Text>
-          </Pressable>
-        </View>
-
-        <HeroSwitcher
-          visible={showHeroSwitcher}
-          onClose={() => setShowHeroSwitcher(false)}
-        />
-        <ConflictResolver
-          conflicts={conflicts}
-          onResolve={resolveConflicts}
-        />
+        {emptyContent}
       </View>
     );
   }
