@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,7 +21,7 @@ type AuthMode = 'choice' | 'signin' | 'signup';
 export default function AuthScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+
   const {
     user,
     isAuthenticated,
@@ -113,15 +113,14 @@ export default function AuthScreen() {
       <View
         style={[
           styles.container,
-          { backgroundColor: theme.colors.background, paddingTop: insets.top },
+          { backgroundColor: theme.colors.background },
         ]}
       >
         <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-          <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.backButton}>
-            <Ionicons name="close" size={24} color={theme.colors.text} />
-          </Pressable>
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Account</Text>
-          <View style={{ width: 40 }} />
+          <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')}>
+            <Ionicons name="close" size={28} color={theme.colors.text} />
+          </Pressable>
         </View>
 
         <ScrollView contentContainerStyle={styles.content}>
@@ -220,7 +219,7 @@ export default function AuthScreen() {
       <View
         style={[
           styles.container,
-          { backgroundColor: theme.colors.background, paddingTop: insets.top },
+          { backgroundColor: theme.colors.background },
         ]}
       >
         <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
@@ -327,15 +326,14 @@ export default function AuthScreen() {
     <View
       style={[
         styles.container,
-        { backgroundColor: theme.colors.background, paddingTop: insets.top },
+        { backgroundColor: theme.colors.background },
       ]}
     >
       <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-        <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.backButton}>
-          <Ionicons name="close" size={24} color={theme.colors.text} />
-        </Pressable>
         <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Sign In</Text>
-        <View style={{ width: 40 }} />
+        <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')}>
+          <Ionicons name="close" size={28} color={theme.colors.text} />
+        </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>

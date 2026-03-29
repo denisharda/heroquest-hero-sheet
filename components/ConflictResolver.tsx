@@ -122,15 +122,13 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
     >
       <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-          <View style={styles.titleRow}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
+          <View style={styles.modalHeader}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               Sync Conflict
             </Text>
-            {onCancel && (
-              <Pressable onPress={handleCancel} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color={theme.colors.textSecondary} />
-              </Pressable>
-            )}
+            <Pressable onPress={handleCancel}>
+              <Ionicons name="close" size={28} color={theme.colors.text} />
+            </Pressable>
           </View>
           <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
             {hasDeletionConflicts && !hasEditConflicts
@@ -301,22 +299,15 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
-  titleRow: {
+  modalHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 8,
   },
-  title: {
+  modalTitle: {
     fontSize: 20,
     fontFamily: 'Cinzel_700Bold',
-    textAlign: 'center',
-    flex: 1,
-  },
-  closeButton: {
-    padding: 4,
-    position: 'absolute',
-    right: 0,
   },
   subtitle: {
     fontSize: 14,
