@@ -73,19 +73,6 @@ export const StatBlock: React.FC = () => {
       />
       <StatBox
         icon={
-          <MaterialCommunityIcons
-            name="dice-multiple"
-            size={24}
-            color={SHARED_COLORS.moveIcon}
-          />
-        }
-        label="MOVE"
-        value={`${computedStats.moveDice}d6`}
-        breakdown={computedStats.moveBreakdown}
-        color={SHARED_COLORS.moveIcon}
-      />
-      <StatBox
-        icon={
           <FontAwesome5
             name="gem"
             size={20}

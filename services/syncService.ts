@@ -213,12 +213,14 @@ class SyncService {
       }
     }
 
-    // Always clear conflicts and pending state, even if finalize fails
+    // Clear conflicts and pending state IMMEDIATELY before async work
+    // so the ConflictResolver modal doesn't reopen from stale state
     this.pendingSync = null;
+    this.updateState({ conflicts: [], pendingRestoreCount: 0, autoShowRestores: false });
     try {
       await this.finalizeSyncMerge(mergedHeroes, toPush, deletedHeroIds);
-    } finally {
-      this.updateState({ conflicts: [], isSyncing: false });
+    } catch {
+      // finalizeSyncMerge has its own error handling
     }
   }
 

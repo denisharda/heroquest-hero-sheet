@@ -33,12 +33,14 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
 
   const hasConflicts = conflicts.length > 0;
 
-  // Open modal when conflicts arrive
+  // Sync modal visibility with conflicts
   useEffect(() => {
     if (hasConflicts) {
       setShowModal(true);
       setChoices(new Map());
       pendingResolve.current = null;
+    } else {
+      setShowModal(false);
     }
   }, [hasConflicts]);
 
