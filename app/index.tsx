@@ -15,6 +15,7 @@ import { useHero } from '@/hooks/useHero';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { useAuth } from '@/hooks/useAuth';
 import { useSync } from '@/hooks/useSync';
+import { isOnboardingComplete } from './onboarding';
 import {
   HeroIdentity,
   StatBlock,
@@ -35,19 +36,39 @@ export default function CharacterSheet() {
   const { hero, createHero } = useHero();
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
   const { isAuthenticated } = useAuth();
-  const { isSyncing, syncError, conflicts, resolveConflicts, cancelConflicts } = useSync();
+  const { isSyncing, syncError, conflicts, resolveConflicts, cancelConflicts, pendingRestoreCount, showPendingRestores, autoShowRestores } = useSync();
   const [showHeroSwitcher, setShowHeroSwitcher] = useState(false);
   const insets = useSafeAreaInsets();
 
-  // Auto-create a hero if none exists
+  // Redirect to onboarding if not completed
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   useEffect(() => {
-    if (!hero) {
-      // Check if there are any heroes, if not we'll show the switcher
+    isOnboardingComplete().then((complete) => {
+      if (!complete) {
+        router.replace('/onboarding');
+      } else {
+        setOnboardingChecked(true);
+      }
+    });
+  }, []);
+
+  // Auto-show pending restores after a delay (only when triggered from auth screen)
+  useEffect(() => {
+    if (autoShowRestores && pendingRestoreCount > 0) {
+      const timer = setTimeout(() => {
+        showPendingRestores();
+      }, 600);
+      return () => clearTimeout(timer);
     }
-  }, [hero]);
+  }, [autoShowRestores, pendingRestoreCount]);
 
   // Only dark theme has texture
   const hasTexture = !!theme.backgroundTexture;
+
+  // Don't render until onboarding check completes
+  if (!onboardingChecked) {
+    return <View style={[styles.container, { backgroundColor: theme.colors.background }]} />;
+  }
 
   if (!hero) {
     const emptyContent = (
@@ -107,6 +128,31 @@ export default function CharacterSheet() {
               {isAuthenticated ? 'Create Hero' : 'Continue as Guest'}
             </Text>
           </Pressable>
+
+          {isAuthenticated && pendingRestoreCount > 0 && (
+            <Pressable
+              style={[
+                styles.createButton,
+                {
+                  backgroundColor: 'transparent',
+                  borderWidth: 2,
+                  borderColor: theme.colors.success,
+                  marginTop: 16,
+                },
+              ]}
+              onPress={showPendingRestores}
+            >
+              <Ionicons name="cloud-download-outline" size={24} color={theme.colors.success} />
+              <Text
+                style={[
+                  styles.createButtonText,
+                  { color: theme.colors.success },
+                ]}
+              >
+                Restore from Cloud ({pendingRestoreCount})
+              </Text>
+            </Pressable>
+          )}
         </View>
 
         <HeroSwitcher

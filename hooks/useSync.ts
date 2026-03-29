@@ -21,13 +21,25 @@ export const useSync = () => {
     syncService.cancelConflicts();
   }, []);
 
+  const showPendingRestores = useCallback(() => {
+    syncService.showPendingRestores();
+  }, []);
+
+  const fetchRestorableHeroes = useCallback(async (): Promise<boolean> => {
+    return syncService.fetchRestorableHeroes();
+  }, []);
+
   return {
     isSyncing: syncState.isSyncing,
     lastSyncedAt: syncState.lastSyncedAt,
     syncError: syncState.error,
     conflicts: syncState.conflicts,
+    pendingRestoreCount: syncState.pendingRestoreCount,
+    autoShowRestores: syncState.autoShowRestores,
     syncNow,
     resolveConflicts,
     cancelConflicts,
+    showPendingRestores,
+    fetchRestorableHeroes,
   };
 };

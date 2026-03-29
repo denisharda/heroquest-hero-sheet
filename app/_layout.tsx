@@ -78,6 +78,12 @@ function RootLayoutNav() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen
+          name="onboarding"
+          options={{
+            animation: 'none',
+          }}
+        />
+        <Stack.Screen
           name="heroes"
           options={{
             presentation: 'modal',

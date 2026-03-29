@@ -30,7 +30,7 @@ export default function AuthScreen() {
     signOut,
     deleteAccount,
   } = useAuth();
-  const { isSyncing, lastSyncedAt, syncError, syncNow } = useSync();
+  const { isSyncing, lastSyncedAt, syncError, syncNow, fetchRestorableHeroes } = useSync();
 
   const [mode, setMode] = useState<AuthMode>('choice');
   const [email, setEmail] = useState('');
@@ -56,10 +56,8 @@ export default function AuthScreen() {
       } else {
         await signInWithEmail(email.trim(), password);
       }
-      // Clear loading before navigating to avoid the loading overlay
-      // persisting on the Account view during the modal dismiss animation
       setLoading(false);
-      router.back();
+      router.replace('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
       setLoading(false);
@@ -119,7 +117,7 @@ export default function AuthScreen() {
         ]}
       >
         <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.backButton}>
             <Ionicons name="close" size={24} color={theme.colors.text} />
           </Pressable>
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Account</Text>
@@ -163,6 +161,27 @@ export default function AuthScreen() {
               </Text>
             </Pressable>
           </View>
+
+          {/* Restore Heroes */}
+          <Pressable
+            style={[styles.actionButton, { backgroundColor: theme.colors.surface }]}
+            onPress={async () => {
+              setLoading(true);
+              const found = await fetchRestorableHeroes();
+              setLoading(false);
+              if (found) {
+                router.canGoBack() ? router.back() : router.replace('/');
+              } else {
+                Alert.alert('No Heroes Found', 'There are no deleted heroes to restore from the cloud.');
+              }
+            }}
+            disabled={loading}
+          >
+            <Ionicons name="cloud-download-outline" size={20} color={theme.colors.accent} />
+            <Text style={[styles.actionText, { color: theme.colors.accent }]}>
+              Restore Deleted Heroes
+            </Text>
+          </Pressable>
 
           {/* Actions */}
           <Pressable
@@ -312,7 +331,7 @@ export default function AuthScreen() {
       ]}
     >
       <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.backButton}>
           <Ionicons name="close" size={24} color={theme.colors.text} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Sign In</Text>
@@ -363,7 +382,7 @@ export default function AuthScreen() {
           </Text>
         </Pressable>
 
-        <Pressable onPress={() => router.back()} style={styles.skipButton}>
+        <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={styles.skipButton}>
           <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>
             Continue without account
           </Text>

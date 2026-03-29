@@ -176,7 +176,7 @@ export interface AuthUser {
 export interface HeroConflict {
   heroId: string;
   heroName: string;
-  local: Hero;
+  local: Hero | null; // null = hero was deleted locally
   remote: Hero;
 }
 
@@ -185,4 +185,6 @@ export interface SyncState {
   lastSyncedAt: number | null;
   error: string | null;
   conflicts: HeroConflict[];
+  pendingRestoreCount: number;
+  autoShowRestores: boolean;
 }

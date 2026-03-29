@@ -36,10 +36,22 @@ class SyncService {
     lastSyncedAt: null,
     error: null,
     conflicts: [],
+    pendingRestoreCount: 0,
+    autoShowRestores: false,
   };
 
   async init(userId: string) {
     this.userId = userId;
+
+    // Wait for store to finish loading from AsyncStorage before reading state
+    if (!useHeroStore.persist.hasHydrated()) {
+      await new Promise<void>((resolve) => {
+        const unsub = useHeroStore.persist.onFinishHydration(() => {
+          unsub();
+          resolve();
+        });
+      });
+    }
 
     await this.restoreDirtyQueue();
 
@@ -90,7 +102,7 @@ class SyncService {
     this.unsubscribeStore = null;
     this.unsubscribeNetInfo = null;
     this.debounceTimer = null;
-    this.updateState({ isSyncing: false, lastSyncedAt: null, error: null, conflicts: [] });
+    this.updateState({ isSyncing: false, lastSyncedAt: null, error: null, conflicts: [], pendingRestoreCount: 0, autoShowRestores: false });
   }
 
   subscribe(listener: SyncListener): () => void {
@@ -111,7 +123,67 @@ class SyncService {
   cancelConflicts() {
     if (!this.pendingSync) return;
     this.pendingSync = null;
-    this.updateState({ conflicts: [] });
+    this.updateState({ conflicts: [], pendingRestoreCount: 0, autoShowRestores: false });
+  }
+
+  // Called by UI when user taps "Restore from Cloud" button on empty state
+  showPendingRestores() {
+    if (!this.pendingSync || this.pendingSync.conflicts.length === 0) return;
+    this.updateState({ conflicts: this.pendingSync.conflicts, pendingRestoreCount: 0 });
+  }
+
+  // Called by UI to fetch and show restorable heroes from cloud
+  async fetchRestorableHeroes(): Promise<boolean> {
+    if (!this.userId || !this.isOnline) return false;
+
+    this.updateState({ isSyncing: true, error: null });
+
+    try {
+      const { data: remoteRows, error } = await supabase
+        .from('heroes')
+        .select('*')
+        .eq('user_id', this.userId)
+        .is('deleted_at', null);
+
+      if (error) throw error;
+
+      const { heroes: localHeroes, deletedHeroIds } = useHeroStore.getState();
+      const localIds = new Set(localHeroes.map((h) => h.id));
+      const deletedSet = new Set(deletedHeroIds);
+
+      const restoreConflicts: HeroConflict[] = [];
+      for (const row of remoteRows ?? []) {
+        const heroData = row.data as Hero;
+        if (!localIds.has(row.id) || deletedSet.has(row.id)) {
+          restoreConflicts.push({
+            heroId: row.id,
+            heroName: heroData.name,
+            local: null,
+            remote: heroData,
+          });
+        }
+      }
+
+      if (restoreConflicts.length === 0) {
+        this.updateState({ isSyncing: false });
+        return false;
+      }
+
+      this.pendingSync = {
+        mergedHeroes: [...localHeroes.filter((h) => !deletedSet.has(h.id))],
+        toPush: [],
+        conflicts: restoreConflicts,
+        deletedHeroIds: [],
+      };
+      // Don't set active conflicts — store as pending so caller can navigate first
+      // and avoid overlapping modal transitions
+      this.updateState({ isSyncing: false, pendingRestoreCount: restoreConflicts.length, autoShowRestores: true });
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to check cloud';
+      this.updateState({ isSyncing: false, error: message });
+      return false;
+    }
   }
 
   // Called by UI after user resolves each conflict
@@ -123,7 +195,16 @@ class SyncService {
     // Apply user's choices
     for (const conflict of conflicts) {
       const choice = resolutions.get(conflict.heroId);
-      if (choice === 'local') {
+      if (conflict.local === null) {
+        // Deletion conflict: hero was deleted locally but exists in cloud
+        if (choice === 'remote') {
+          // Restore from cloud
+          mergedHeroes.push(conflict.remote);
+        } else {
+          // Confirm deletion — soft-delete from cloud
+          deletedHeroIds.push(conflict.heroId);
+        }
+      } else if (choice === 'local') {
         mergedHeroes.push(conflict.local);
         toPush.push(conflict.local);
       } else {
@@ -132,10 +213,13 @@ class SyncService {
       }
     }
 
-    // Now finalize the sync
-    await this.finalizeSyncMerge(mergedHeroes, toPush, deletedHeroIds);
+    // Always clear conflicts and pending state, even if finalize fails
     this.pendingSync = null;
-    this.updateState({ conflicts: [] });
+    try {
+      await this.finalizeSyncMerge(mergedHeroes, toPush, deletedHeroIds);
+    } finally {
+      this.updateState({ conflicts: [], isSyncing: false });
+    }
   }
 
   // --- Full Sync (bidirectional merge) ---
@@ -169,14 +253,43 @@ class SyncService {
       const mergedHeroes: Hero[] = [];
       const toPush: Hero[] = [];
       const conflicts: HeroConflict[] = [];
+      // Track which deleted IDs are safe to propagate (no cloud version exists)
+      const confirmedDeletes: string[] = [];
 
       const allIds = new Set([...localMap.keys(), ...remoteMap.keys()]);
 
-      for (const id of allIds) {
-        if (deletedSet.has(id)) continue;
+      // Fresh device with cloud heroes: store as pending restores (don't auto-show)
+      if (localMap.size === 0 && deletedSet.size === 0 && remoteMap.size > 0) {
+        for (const [id, remote] of remoteMap) {
+          conflicts.push({
+            heroId: id,
+            heroName: remote.data.name,
+            local: null,
+            remote: remote.data,
+          });
+        }
+        this.pendingSync = { mergedHeroes, toPush, conflicts, deletedHeroIds: confirmedDeletes };
+        this.updateState({ isSyncing: false, pendingRestoreCount: conflicts.length });
+        return;
+      }
 
+      for (const id of allIds) {
         const local = localMap.get(id);
         const remote = remoteMap.get(id);
+
+        if (deletedSet.has(id)) {
+          if (remote) {
+            // Deleted locally but exists in cloud — ask the user
+            conflicts.push({
+              heroId: id,
+              heroName: remote.data.name,
+              local: null,
+              remote: remote.data,
+            });
+          }
+          // If no remote version, deletion is already complete — nothing to do
+          continue;
+        }
 
         if (local && remote) {
           if (local.updatedAt === remote.updated_at) {
@@ -199,9 +312,18 @@ class SyncService {
       }
 
       if (conflicts.length > 0) {
-        // Pause sync — wait for user to resolve conflicts
-        this.pendingSync = { mergedHeroes, toPush, conflicts, deletedHeroIds };
-        this.updateState({ isSyncing: false, conflicts });
+        const editConflicts = conflicts.filter((c) => c.local !== null);
+        const restoreConflicts = conflicts.filter((c) => c.local === null);
+
+        this.pendingSync = { mergedHeroes, toPush, conflicts, deletedHeroIds: confirmedDeletes };
+
+        if (editConflicts.length > 0) {
+          // Auto-show edit conflicts (include restore conflicts in the same drawer)
+          this.updateState({ isSyncing: false, conflicts });
+        } else {
+          // Restore-only conflicts — don't auto-show, let user trigger via button
+          this.updateState({ isSyncing: false, pendingRestoreCount: restoreConflicts.length });
+        }
         return;
       }
 
