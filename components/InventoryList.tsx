@@ -11,9 +11,18 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { ITEM_DEFINITIONS, ITEM_CATEGORIES, createItemInstance } from '@/data/items';
-import { Item, ItemCategory } from '@/types';
-import { ITEM_CATEGORY_COLORS } from '@/constants/colors';
+import { Item, ItemCategory, ThemeColors } from '@/types';
 import * as Haptics from 'expo-haptics';
+
+const getCategoryColor = (category: ItemCategory, colors: ThemeColors): string => {
+  const map: Record<ItemCategory, string> = {
+    potion: colors.itemPotion,
+    tool: colors.itemTool,
+    artifact: colors.itemArtifact,
+    misc: colors.itemMisc,
+  };
+  return map[category];
+};
 
 interface InventoryItemProps {
   item: Item;
@@ -25,7 +34,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
   onPress,
 }) => {
   const { theme } = useTheme();
-  const categoryColor = ITEM_CATEGORY_COLORS[item.category];
+  const categoryColor = getCategoryColor(item.category, theme.colors);
 
   const getCategoryIcon = (): string => {
     switch (item.category) {

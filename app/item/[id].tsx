@@ -11,9 +11,18 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { ITEM_CATEGORY_COLORS } from '@/constants/colors';
-import { ItemCategory } from '@/types';
+import { ItemCategory, ThemeColors } from '@/types';
 import * as Haptics from 'expo-haptics';
+
+const getCategoryColor = (category: ItemCategory, colors: ThemeColors): string => {
+  const map: Record<ItemCategory, string> = {
+    potion: colors.itemPotion,
+    tool: colors.itemTool,
+    artifact: colors.itemArtifact,
+    misc: colors.itemMisc,
+  };
+  return map[category];
+};
 
 const CATEGORY_ICONS: Record<ItemCategory, keyof typeof MaterialCommunityIcons.glyphMap> = {
   potion: 'bottle-tonic',
@@ -48,7 +57,7 @@ export default function ItemDetailScreen() {
     );
   }
 
-  const categoryColor = ITEM_CATEGORY_COLORS[item.category];
+  const categoryColor = getCategoryColor(item.category, theme.colors);
   const categoryIcon = CATEGORY_ICONS[item.category];
   const categoryLabel = CATEGORY_LABELS[item.category];
 
