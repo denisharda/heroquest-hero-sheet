@@ -5,74 +5,18 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetFlatList, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { WEAPONS } from '@/data/weapons';
 import { NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
-import { ITEM_CATEGORY_COLORS } from '@/constants/colors';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
+import { EquipmentSlotCard } from './EquipmentSlot';
 
 type EquipmentItem = Weapon | Shield | Helmet | Armor;
-
-interface EquipmentRowProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  onPress: () => void;
-  twoHanded?: boolean;
-  isArtifact?: boolean;
-}
-
-const EquipmentRow: React.FC<EquipmentRowProps> = ({
-  icon,
-  label,
-  value,
-  onPress,
-  twoHanded,
-  isArtifact,
-}) => {
-  const { theme } = useTheme();
-  const artifactColor = ITEM_CATEGORY_COLORS.artifact;
-
-  return (
-    <Pressable
-      style={[
-        styles.equipmentRow,
-        {
-          backgroundColor: isArtifact ? artifactColor + '10' : theme.colors.surface,
-          borderColor: isArtifact ? artifactColor : theme.colors.border,
-          borderWidth: isArtifact ? 1.5 : 1,
-        },
-      ]}
-      onPress={onPress}
-    >
-      <View style={styles.equipmentIcon}>{icon}</View>
-      <View style={styles.equipmentInfo}>
-        <Text style={[styles.equipmentLabel, { color: theme.colors.textSecondary }]}>
-          {label}
-        </Text>
-        <Text style={[styles.equipmentValue, { color: isArtifact ? artifactColor : theme.colors.text }]}>
-          {value}
-        </Text>
-        {twoHanded && (
-          <Text style={[styles.twoHandedBadge, { color: theme.colors.accent }]}>
-            Two-Handed
-          </Text>
-        )}
-        {isArtifact && (
-          <Text style={[styles.twoHandedBadge, { color: artifactColor }]}>
-            Artifact
-          </Text>
-        )}
-      </View>
-      <Ionicons name="chevron-forward" size={20} color={isArtifact ? artifactColor : theme.colors.textSecondary} />
-    </Pressable>
-  );
-};
 
 export const EquipmentSelector: React.FC = () => {
   const { theme } = useTheme();
@@ -177,35 +121,41 @@ export const EquipmentSelector: React.FC = () => {
         EQUIPPED
       </Text>
 
-      <EquipmentRow
-        icon={<MaterialCommunityIcons name="sword" size={24} color={hero.equipment.weapon?.isArtifact ? ITEM_CATEGORY_COLORS.artifact : theme.colors.accent} />}
-        label="Weapon"
-        value={hero.equipment.weapon?.name ?? 'None'}
-        onPress={() => openSelector('weapon')}
-        twoHanded={hero.equipment.weapon?.twoHanded}
-        isArtifact={hero.equipment.weapon?.isArtifact}
-      />
+      {/* Top row: Helmet */}
+      <View style={styles.topRow}>
+        <EquipmentSlotCard
+          slotType="helmet"
+          item={hero.equipment.helmet}
+          isArtifact={false}
+          isDisabled={false}
+          onPress={() => openSelector('helmet')}
+        />
+      </View>
 
-      <EquipmentRow
-        icon={<FontAwesome5 name="shield-alt" size={22} color={isShieldDisabled ? theme.colors.textSecondary : theme.colors.accent} />}
-        label={isShieldDisabled ? 'Shield (2H weapon equipped)' : 'Shield'}
-        value={hero.equipment.shield?.name ?? 'None'}
-        onPress={() => !isShieldDisabled && openSelector('shield')}
-      />
-
-      <EquipmentRow
-        icon={<MaterialCommunityIcons name="hard-hat" size={24} color={theme.colors.accent} />}
-        label="Helmet"
-        value={hero.equipment.helmet?.name ?? 'None'}
-        onPress={() => openSelector('helmet')}
-      />
-
-      <EquipmentRow
-        icon={<MaterialCommunityIcons name="tshirt-crew" size={24} color={theme.colors.accent} />}
-        label="Armor"
-        value={hero.equipment.armor?.name ?? 'None'}
-        onPress={() => openSelector('armor')}
-      />
+      {/* Middle row: Weapon - Armor - Shield */}
+      <View style={styles.middleRow}>
+        <EquipmentSlotCard
+          slotType="weapon"
+          item={hero.equipment.weapon}
+          isArtifact={hero.equipment.weapon?.isArtifact ?? false}
+          isDisabled={false}
+          onPress={() => openSelector('weapon')}
+        />
+        <EquipmentSlotCard
+          slotType="armor"
+          item={hero.equipment.armor}
+          isArtifact={false}
+          isDisabled={false}
+          onPress={() => openSelector('armor')}
+        />
+        <EquipmentSlotCard
+          slotType="shield"
+          item={hero.equipment.shield}
+          isArtifact={false}
+          isDisabled={isShieldDisabled}
+          onPress={() => openSelector('shield')}
+        />
+      </View>
 
       <BottomSheetModal
         ref={bottomSheetRef}
@@ -297,35 +247,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     letterSpacing: 0.5,
   },
-  equipmentRow: {
+  topRow: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  middleRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 6,
-  },
-  equipmentIcon: {
-    width: 40,
-    alignItems: 'center',
-  },
-  equipmentInfo: {
-    flex: 1,
-    marginLeft: 8,
-  },
-  equipmentLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  equipmentValue: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  twoHandedBadge: {
-    fontSize: 10,
-    fontWeight: '600',
-    marginTop: 2,
+    gap: 8,
   },
   modalHeader: {
     flexDirection: 'row',
