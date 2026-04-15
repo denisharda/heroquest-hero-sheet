@@ -31,7 +31,7 @@ export const darkFantasyTheme: Theme = {
 
     // Utility colors
     gold: '#DAA520',          // Goldenrod (treasure)
-    danger: '#8B0000',        // Dark red
-    success: '#2E5D3A',       // Forest green
+    danger: '#E05555',        // Lighter red (readable on dark surfaces)
+    success: '#5DAE72',       // Lighter green (readable on dark surfaces)
   },
 };

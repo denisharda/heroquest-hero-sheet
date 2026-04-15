@@ -1,16 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, AccessibilityInfo } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  Easing,
-  SharedValue,
-} from 'react-native-reanimated';
+import React from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
-import { ITEM_CATEGORY_COLORS } from '@/constants/colors';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot as SlotType } from '@/types';
 import * as Haptics from 'expo-haptics';
 
@@ -54,31 +45,6 @@ function SlotIcon({ slotType, color, opacity }: { slotType: SlotType; color: str
   return <MaterialCommunityIcons name={config.name as any} size={config.size} color={color} style={{ opacity }} />;
 }
 
-function useArtifactPulse(isArtifact: boolean): SharedValue<number> {
-  const glowOpacity = useSharedValue(0.15);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    const listener = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
-    return () => listener.remove();
-  }, []);
-
-  useEffect(() => {
-    if (isArtifact && !reduceMotion) {
-      glowOpacity.value = withRepeat(
-        withTiming(0.4, { duration: 1500, easing: Easing.inOut(Easing.sin) }),
-        -1,
-        true
-      );
-    } else {
-      glowOpacity.value = isArtifact ? 0.3 : 0.15;
-    }
-  }, [isArtifact, reduceMotion]);
-
-  return glowOpacity;
-}
-
 export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
   slotType,
   item,
@@ -88,12 +54,6 @@ export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
 }) => {
   const { theme } = useTheme();
   const isEmpty = item === null;
-
-  const artifactColor = ITEM_CATEGORY_COLORS.artifact;
-  const glowOpacity = useArtifactPulse(isArtifact);
-  const artifactGlowStyle = useAnimatedStyle(() => ({
-    shadowOpacity: glowOpacity.value,
-  }));
 
   const handlePress = async () => {
     if (isDisabled) return;
@@ -146,44 +106,7 @@ export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
     );
   }
 
-  // --- Artifact item state ---
-  if (isArtifact) {
-    const artifactNameColor = theme.isDark ? '#c9a0dc' : '#7B3FA0';
-    return (
-      <Animated.View
-        style={[
-          styles.slot,
-          slotType === 'helmet' ? styles.slotHelmet : styles.slotMiddle,
-          {
-            backgroundColor: artifactColor + '14',
-            borderColor: artifactColor,
-            borderWidth: 2,
-            shadowColor: artifactColor,
-            shadowOffset: { width: 0, height: 0 },
-            shadowRadius: 12,
-            elevation: 8,
-          },
-          artifactGlowStyle,
-        ]}
-      >
-        <Pressable onPress={handlePress} style={styles.artifactPressable}>
-          <SlotIcon slotType={slotType} color={artifactColor} opacity={1} />
-          <Text style={[styles.slotLabel, { color: artifactColor }]}>
-            {SLOT_LABELS[slotType]} ✦
-          </Text>
-          <Text style={[styles.itemName, { color: artifactNameColor }]} numberOfLines={1}>
-            {item!.name}
-          </Text>
-          <Text style={[styles.statText, { color: artifactColor + 'AA' }]}>
-            {getStatText(slotType, item!)}
-          </Text>
-          <Text style={[styles.artifactBadge, { color: artifactColor }]}>Artifact</Text>
-        </Pressable>
-      </Animated.View>
-    );
-  }
-
-  // --- Normal item state (non-artifact) ---
+  // --- Equipped item state ---
   return (
     <Pressable
       onPress={handlePress}
@@ -198,7 +121,7 @@ export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
         {SLOT_LABELS[slotType]}
       </Text>
       <Text style={[styles.itemName, { color: theme.colors.text }]} numberOfLines={1}>
-        {item.name}
+        {item.name}{isArtifact ? ' \u2605' : ''}
       </Text>
       <Text style={[styles.statText, { color: theme.colors.textSecondary }]}>
         {getStatText(slotType, item)}
@@ -261,16 +184,5 @@ const styles = StyleSheet.create({
   blockedText: {
     fontSize: 9,
     fontWeight: '600',
-  },
-  artifactPressable: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  artifactBadge: {
-    fontSize: 9,
-    fontWeight: '700',
-    marginTop: 2,
-    letterSpacing: 0.5,
   },
 });

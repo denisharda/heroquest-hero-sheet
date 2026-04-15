@@ -26,11 +26,11 @@ export const fantasyTheme: Theme = {
     // Health/Mind points
     health: '#C41E3A',        // Red
     healthEmpty: '#D9C5C5',   // Faded red/pink
-    mind: '#4169E1',          // Royal Blue
-    mindEmpty: '#C5CAD9',     // Faded blue
+    mind: '#6B3FA0',          // Mystical purple
+    mindEmpty: '#D5C5D9',     // Faded purple
 
     // Utility colors
-    gold: '#FFD700',          // Gold
+    gold: '#B8860B',          // Dark Goldenrod (readable on parchment)
     danger: '#8B0000',        // Dark Red
     success: '#228B22',       // Forest Green
   },
