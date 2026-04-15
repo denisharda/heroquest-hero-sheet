@@ -23,6 +23,7 @@ import {
   EquipmentSelector,
   SpellTracker,
   GoldCounter,
+  ArmoryList,
   InventoryList,
   QuestProgress,
   HeroSwitcher,
@@ -260,6 +261,7 @@ export default function CharacterSheet() {
         <EquipmentSelector />
         <SpellTracker />
         <GoldCounter />
+        <ArmoryList />
         <InventoryList />
         <QuestProgress />
 
@@ -419,7 +421,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: 'Cinzel_700Bold',
     marginLeft: 8,
   },

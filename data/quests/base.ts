@@ -1,15 +1,9 @@
-export interface Quest {
-  id: number;
-  name: string;
-  wanderingMonster: string;
-  description: string;
-  artifact?: string;
-  notes?: string;
-}
+import { Quest } from './types';
 
-export const QUESTS: Quest[] = [
+export const BASE_QUESTS: Quest[] = [
   {
     id: 1,
+    questPack: 'base',
     name: 'The Trial',
     wanderingMonster: 'Orc',
     description: 'Your first quest as heroes. Prove your worth by navigating this introductory dungeon and defeating the monsters within. This is a test of your abilities before the real challenges begin.',
@@ -17,6 +11,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 2,
+    questPack: 'base',
     name: 'The Rescue of Sir Ragnar',
     wanderingMonster: 'Orc',
     description: 'Sir Ragnar, a noble knight, has been captured by Orcs and is being held prisoner in a dungeon. You must find and rescue him before it is too late.',
@@ -24,6 +19,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 3,
+    questPack: 'base',
     name: 'Lair of the Orc Warlord',
     wanderingMonster: 'Orc',
     description: 'The Orc Warlord Ulag has been terrorizing the countryside. Enter his lair and put an end to his reign of terror once and for all.',
@@ -31,6 +27,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 4,
+    questPack: 'base',
     name: "Prince Magnus' Gold",
     wanderingMonster: 'Abomination',
     description: 'Prince Magnus hid a treasure of gold coins before his untimely death. The treasure is now guarded by foul creatures. Recover the gold and return it to the Empire.',
@@ -38,6 +35,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 5,
+    questPack: 'base',
     name: "Melar's Maze",
     wanderingMonster: 'Zombie',
     description: 'The wizard Melar created a magical maze filled with traps and undead guardians. Somewhere within lies the Talisman of Lore, a powerful magical artifact.',
@@ -46,6 +44,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 6,
+    questPack: 'base',
     name: 'Legacy of the Orc Warlord',
     wanderingMonster: 'Abomination',
     description: "Though Ulag is dead, his legacy lives on. His followers have gathered his remaining treasures and plot revenge. Among them is the Wizard's Cloak.",
@@ -54,6 +53,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 7,
+    questPack: 'base',
     name: 'The Lost Wizard',
     wanderingMonster: 'Mummy',
     description: "A wizard named Dorin went searching for the legendary Borin's Armor and never returned. Find out what happened to him and recover the armor if possible.",
@@ -62,6 +62,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 8,
+    questPack: 'base',
     name: 'The Fire Mage',
     wanderingMonster: 'Abomination',
     description: 'Balur, a powerful Fire Mage, threatens the land with his destructive magic. Enter his volcanic lair and defeat him. The Wand of Magic awaits those brave enough to claim it.',
@@ -70,6 +71,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 9,
+    questPack: 'base',
     name: 'Race Against Time',
     wanderingMonster: 'Abomination',
     description: 'A deadly plague spreads across the land. The only cure is the Elixir of Life, hidden deep within an ancient tomb. Time is running out.',
@@ -78,6 +80,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 10,
+    questPack: 'base',
     name: 'Castle of Mystery',
     wanderingMonster: 'Ghost',
     description: 'A haunted castle holds many secrets and the Ring of Return. Ghosts roam the halls, and reality itself seems unstable within these cursed walls.',
@@ -86,6 +89,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 11,
+    questPack: 'base',
     name: 'Bastion of Dread',
     wanderingMonster: 'Abomination',
     description: "A fortress of evil stands as the last barrier before the Witch Lord's domain. Within its walls lies Orc's Bane, a sword deadly to greenskins.",
@@ -94,6 +98,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 12,
+    questPack: 'base',
     name: 'Barak Tor—Barrow of the Witch Lord',
     wanderingMonster: 'Skeleton',
     description: "The dreaded Witch Lord awaits in his barrow tomb. Only the Spirit Blade can harm him, but it lies elsewhere. This is a reconnaissance mission to learn his weaknesses.",
@@ -102,6 +107,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 13,
+    questPack: 'base',
     name: 'Quest for the Spirit Blade',
     wanderingMonster: 'Dread Warrior',
     description: 'The Spirit Blade is the only weapon that can harm the Witch Lord. It is guarded by powerful Dread Warriors. Claim the blade to prepare for the final battle.',
@@ -110,6 +116,7 @@ export const QUESTS: Quest[] = [
   },
   {
     id: 14,
+    questPack: 'base',
     name: 'Return to Barak Tor',
     wanderingMonster: 'Mummy',
     description: 'Armed with the Spirit Blade, return to Barak Tor and destroy the Witch Lord once and for all. This is the final quest—the fate of the Empire rests on your shoulders.',
@@ -117,7 +124,3 @@ export const QUESTS: Quest[] = [
     notes: 'Final battle against the Witch Lord. Artifact: Spell Ring (cast one spell twice per quest).',
   },
 ];
-
-export const getQuestById = (id: number): Quest | undefined => {
-  return QUESTS.find(q => q.id === id);
-};

@@ -1,4 +1,4 @@
-import { Item, ItemCategory, ArtifactEffect } from '@/types';
+import { Item, ItemCategory, ArtifactEffect, QuestPack } from '@/types';
 
 // Base item definitions (quantity will be set when added to inventory)
 interface ItemDefinition {
@@ -7,6 +7,7 @@ interface ItemDefinition {
   category: ItemCategory;
   description: string;
   goldCost: number;
+  pack?: QuestPack;
 }
 
 export const ITEM_DEFINITIONS: ItemDefinition[] = [

@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Hero, HeroClassName, Equipment, Spell, Item, HistoryEntry, Weapon, Shield, Helmet, Armor, SpellSchool } from '@/types';
+import { Hero, HeroClassName, Equipment, OwnedEquipment, Spell, Item, HistoryEntry, Weapon, Shield, Helmet, Armor, SpellSchool } from '@/types';
 import { HERO_CLASSES } from '@/data/heroes';
 import { createSpellsFromSchools } from '@/data/spells';
-import { getStartingWeapon } from '@/data/weapons';
+import { getStartingWeapon, getWeaponById, STARTING_WEAPONS } from '@/data/weapons';
 import { ARTIFACT_EFFECTS } from '@/data/items';
 
 const MAX_HISTORY_SIZE = 50;
@@ -37,6 +37,26 @@ const getMaxMindPoints = (hero: Hero): number => {
   return maxMP;
 };
 
+// Normalize a hero that may be missing ownedEquipment (from old app version or sync)
+const normalizeHeroOwnedEquipment = (hero: any): any => {
+  if (hero.ownedEquipment) return hero;
+  const startingWeapon = getWeaponById(STARTING_WEAPONS[hero.heroClass as HeroClassName]);
+  const weapons: Weapon[] = [];
+  if (startingWeapon) weapons.push(startingWeapon);
+  if (hero.equipment?.weapon && hero.equipment.weapon.id !== startingWeapon?.id) {
+    weapons.push(hero.equipment.weapon);
+  }
+  return {
+    ...hero,
+    ownedEquipment: {
+      weapons,
+      shields: hero.equipment?.shield ? [hero.equipment.shield] : [],
+      helmets: hero.equipment?.helmet ? [hero.equipment.helmet] : [],
+      armor: hero.equipment?.armor ? [hero.equipment.armor] : [],
+    },
+  };
+};
+
 // Generate unique ID
 const generateId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -66,6 +86,12 @@ const createNewHero = (name: string, heroClass: HeroClassName, spellSchools: Spe
       shield: null,
       helmet: null,
       armor: null,
+    },
+    ownedEquipment: {
+      weapons: startingWeapon ? [startingWeapon] : [],
+      shields: [],
+      helmets: [],
+      armor: [],
     },
     spells,
     gold: 0,
@@ -98,11 +124,21 @@ interface HeroStore {
   setMindPoints: (points: number) => void;
   adjustMindPoints: (delta: number) => void;
 
-  // Actions - Equipment
+  // Actions - Equipment (equip from owned)
   equipWeapon: (weapon: Weapon | null) => void;
   equipShield: (shield: Shield | null) => void;
   equipHelmet: (helmet: Helmet | null) => void;
   equipArmor: (armor: Armor | null) => void;
+
+  // Actions - Owned Equipment (armory)
+  addOwnedWeapon: (weapon: Weapon) => void;
+  addOwnedShield: (shield: Shield) => void;
+  addOwnedHelmet: (helmet: Helmet) => void;
+  addOwnedArmor: (armor: Armor) => void;
+  removeOwnedWeapon: (weaponId: string) => boolean;
+  removeOwnedShield: (shieldId: string) => boolean;
+  removeOwnedHelmet: (helmetId: string) => boolean;
+  removeOwnedArmor: (armorId: string) => boolean;
 
   // Actions - Spells
   toggleSpellUsed: (spellId: string) => void;
@@ -422,6 +458,179 @@ export const useHeroStore = create<HeroStore>()(
         });
       },
 
+      // Owned Equipment (Armory)
+      addOwnedWeapon: (weapon) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.ownedEquipment.weapons.some((w) => w.id === weapon.id)) return;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            weapons: [...oldHero.ownedEquipment.weapons, weapon],
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'addOwnedWeapon', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+      },
+
+      addOwnedShield: (shield) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.ownedEquipment.shields.some((s) => s.id === shield.id)) return;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            shields: [...oldHero.ownedEquipment.shields, shield],
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'addOwnedShield', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+      },
+
+      addOwnedHelmet: (helmet) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.ownedEquipment.helmets.some((h) => h.id === helmet.id)) return;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            helmets: [...oldHero.ownedEquipment.helmets, helmet],
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'addOwnedHelmet', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+      },
+
+      addOwnedArmor: (armor) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.ownedEquipment.armor.some((a) => a.id === armor.id)) return;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            armor: [...oldHero.ownedEquipment.armor, armor],
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'addOwnedArmor', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+      },
+
+      removeOwnedWeapon: (weaponId) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return false;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return false;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.equipment.weapon?.id === weaponId) return false; // Can't remove equipped
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            weapons: oldHero.ownedEquipment.weapons.filter((w) => w.id !== weaponId),
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'removeOwnedWeapon', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+        return true;
+      },
+
+      removeOwnedShield: (shieldId) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return false;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return false;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.equipment.shield?.id === shieldId) return false;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            shields: oldHero.ownedEquipment.shields.filter((s) => s.id !== shieldId),
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'removeOwnedShield', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+        return true;
+      },
+
+      removeOwnedHelmet: (helmetId) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return false;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return false;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.equipment.helmet?.id === helmetId) return false;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            helmets: oldHero.ownedEquipment.helmets.filter((h) => h.id !== helmetId),
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'removeOwnedHelmet', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+        return true;
+      },
+
+      removeOwnedArmor: (armorId) => {
+        const { currentHeroId, heroes, history, historyIndex } = get();
+        if (!currentHeroId) return false;
+        const heroIndex = heroes.findIndex((h) => h.id === currentHeroId);
+        if (heroIndex === -1) return false;
+        const oldHero = heroes[heroIndex];
+        if (oldHero.equipment.armor?.id === armorId) return false;
+        const updatedHero = {
+          ...oldHero,
+          ownedEquipment: {
+            ...oldHero.ownedEquipment,
+            armor: oldHero.ownedEquipment.armor.filter((a) => a.id !== armorId),
+          },
+          updatedAt: Date.now(),
+        };
+        const newHistory = saveToHistory(oldHero, 'removeOwnedArmor', history, historyIndex);
+        const newHeroes = [...heroes];
+        newHeroes[heroIndex] = updatedHero;
+        set({ heroes: newHeroes, ...newHistory });
+        return true;
+      },
+
       // Spells
       toggleSpellUsed: (spellId) => {
         const { currentHeroId, heroes, history, historyIndex } = get();
@@ -713,13 +922,15 @@ export const useHeroStore = create<HeroStore>()(
 
       mergeHeroes: (mergedHeroes) => {
         set((state) => {
+          // Normalize heroes that may lack ownedEquipment (from older app versions)
+          const normalizedHeroes = mergedHeroes.map(normalizeHeroOwnedEquipment);
           // Preserve currentHeroId if the hero still exists in merged set
-          const currentStillExists = mergedHeroes.some((h) => h.id === state.currentHeroId);
+          const currentStillExists = normalizedHeroes.some((h: Hero) => h.id === state.currentHeroId);
           return {
-            heroes: mergedHeroes,
+            heroes: normalizedHeroes,
             currentHeroId: currentStillExists
               ? state.currentHeroId
-              : (mergedHeroes.length > 0 ? mergedHeroes[0].id : null),
+              : (normalizedHeroes.length > 0 ? normalizedHeroes[0].id : null),
             // Reset undo history to prevent stale references
             history: [],
             historyIndex: -1,
@@ -736,7 +947,7 @@ export const useHeroStore = create<HeroStore>()(
     }),
     {
       name: 'heroquest-heroes',
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         heroes: state.heroes,
@@ -768,6 +979,15 @@ export const useHeroStore = create<HeroStore>()(
           return {
             ...state,
             deletedHeroIds: [],
+          };
+        }
+
+        // Migration from version 2 to version 3: add ownedEquipment
+        if (version === 2) {
+          const migratedHeroes = state.heroes.map((hero: any) => normalizeHeroOwnedEquipment(hero));
+          return {
+            ...state,
+            heroes: migratedHeroes,
           };
         }
 

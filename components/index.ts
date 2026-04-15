@@ -4,6 +4,7 @@ export { HealthTracker } from './HealthTracker';
 export { EquipmentSelector } from './EquipmentSelector';
 export { SpellTracker } from './SpellTracker';
 export { GoldCounter } from './GoldCounter';
+export { ArmoryList } from './ArmoryList';
 export { InventoryList } from './InventoryList';
 export { QuestProgress } from './QuestProgress';
 export { HeroSwitcher } from './HeroSwitcher';

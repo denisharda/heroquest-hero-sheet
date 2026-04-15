@@ -1,3 +1,16 @@
+// Expansion Packs
+export type QuestPack =
+  | 'base'
+  | 'kellars-keep'
+  | 'return-of-the-witch-lord'
+  | 'against-the-ogre-horde'
+  | 'mage-of-the-mirror'
+  | 'the-frozen-horror'
+  | 'rise-of-the-dread-moon'
+  | 'the-spirit-queens-torment'
+  | 'first-light'
+  | 'jungles-of-delthrak';
+
 // Artifact Effects
 export interface ArtifactEffect {
   bonusBodyPoints?: number;
@@ -33,6 +46,7 @@ export interface Weapon {
   diagonalAttack: boolean;
   twoHanded: boolean;
   goldCost: number;
+  pack?: QuestPack;
   restrictedClasses?: HeroClassName[];
   description?: string;
   throwable?: boolean;
@@ -45,6 +59,7 @@ export interface Shield {
   name: string;
   defendDice: number;
   goldCost: number;
+  pack?: QuestPack;
   description?: string;
   restrictedClasses?: HeroClassName[];
 }
@@ -54,6 +69,7 @@ export interface Helmet {
   name: string;
   defendDice: number;
   goldCost: number;
+  pack?: QuestPack;
   description?: string;
   restrictedClasses?: HeroClassName[];
 }
@@ -63,6 +79,7 @@ export interface Armor {
   name: string;
   defendDice: number;
   goldCost: number;
+  pack?: QuestPack;
   description?: string;
   restrictedClasses?: HeroClassName[];
   movementPenalty?: boolean; // Reduces movement to 1d6
@@ -73,6 +90,13 @@ export interface Equipment {
   shield: Shield | null;
   helmet: Helmet | null;
   armor: Armor | null;
+}
+
+export interface OwnedEquipment {
+  weapons: Weapon[];
+  shields: Shield[];
+  helmets: Helmet[];
+  armor: Armor[];
 }
 
 // Spells
@@ -106,6 +130,7 @@ export interface Hero {
   currentBodyPoints: number;
   currentMindPoints: number;
   equipment: Equipment;
+  ownedEquipment: OwnedEquipment;
   spells: Spell[];
   gold: number;
   inventory: Item[];

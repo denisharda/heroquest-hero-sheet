@@ -1,4 +1,4 @@
-import { Spell, SpellSchool } from '@/types';
+import { Spell, SpellSchool, QuestPack } from '@/types';
 
 // Base spell definitions (without the 'used' state)
 interface SpellDefinition {
@@ -6,6 +6,7 @@ interface SpellDefinition {
   name: string;
   school: SpellSchool;
   description: string;
+  pack?: QuestPack;
 }
 
 export const SPELL_DEFINITIONS: SpellDefinition[] = [

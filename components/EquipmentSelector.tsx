@@ -11,8 +11,8 @@ import {
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { getAvailableWeapons, getStartingWeapon, WEAPONS } from '@/data/weapons';
-import { getAvailableShields, NO_SHIELD, getAvailableHelmets, NO_HELMET, getAvailableArmor, NO_ARMOR } from '@/data/armor';
+import { WEAPONS } from '@/data/weapons';
+import { NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
 
@@ -78,28 +78,26 @@ export const EquipmentSelector: React.FC = () => {
   const getItemsForSlot = (): EquipmentItem[] => {
     switch (selectedSlot) {
       case 'weapon': {
-        const startingWeapon = getStartingWeapon(hero.heroClass);
-        const available = getAvailableWeapons(hero.heroClass);
-        // Remove starting weapon from the list if present (it will be first)
-        const filtered = available.filter((w) => w.id !== startingWeapon?.id);
-        const base = startingWeapon ? [startingWeapon, ...filtered] : available;
-        // Include artifact weapons the hero has in inventory
+        const owned = hero.ownedEquipment?.weapons ?? [];
+        // Also include artifact weapons the hero has in inventory
+        const ownedIds = new Set(owned.map((w) => w.id));
         const inventoryArtifactWeaponIds = hero.inventory
           .filter((i) => i.category === 'artifact')
           .map((i) => i.id);
         const artifactWeapons = WEAPONS.filter(
           (w) => w.isArtifact
             && inventoryArtifactWeaponIds.includes(w.id)
+            && !ownedIds.has(w.id)
             && (!w.restrictedClasses || !w.restrictedClasses.includes(hero.heroClass))
         );
-        return [...base, ...artifactWeapons];
+        return [...owned, ...artifactWeapons];
       }
       case 'shield':
-        return [NO_SHIELD, ...getAvailableShields(hero.heroClass)];
+        return [NO_SHIELD, ...(hero.ownedEquipment?.shields ?? [])];
       case 'helmet':
-        return [NO_HELMET, ...getAvailableHelmets(hero.heroClass)];
+        return [NO_HELMET, ...(hero.ownedEquipment?.helmets ?? [])];
       case 'armor':
-        return [NO_ARMOR, ...getAvailableArmor(hero.heroClass)];
+        return [NO_ARMOR, ...(hero.ownedEquipment?.armor ?? [])];
       default:
         return [];
     }
@@ -154,7 +152,7 @@ export const EquipmentSelector: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-        EQUIPMENT
+        EQUIPPED
       </Text>
 
       <EquipmentRow
@@ -211,6 +209,11 @@ export const EquipmentSelector: React.FC = () => {
             <FlatList
               data={getItemsForSlot()}
               keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
+                  No items in your armory for this slot.{'\n'}Add equipment from the Armory section below.
+                </Text>
+              }
               renderItem={({ item }) => {
                 const isSelected = item.id === getCurrentItemId();
                 const statLabel = getStatLabel(item);
@@ -381,5 +384,11 @@ const styles = StyleSheet.create({
   itemGold: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 14,
+    padding: 24,
+    lineHeight: 20,
   },
 });
