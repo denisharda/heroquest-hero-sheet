@@ -266,8 +266,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
   },
   artifactBadge: {
     fontSize: 9,

@@ -153,7 +153,7 @@ export const EquipmentSelector: React.FC = () => {
           item={hero.equipment.shield}
           isArtifact={false}
           isDisabled={isShieldDisabled}
-          onPress={() => openSelector('shield')}
+          onPress={() => !isShieldDisabled && openSelector('shield')}
         />
       </View>
 
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   },
   middleRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   modalHeader: {
     flexDirection: 'row',
