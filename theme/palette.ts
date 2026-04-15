@@ -1,0 +1,36 @@
+// theme/palette.ts
+export const lightPalette = {
+  red: '#C41E3A',
+  green: '#228B22',
+  blue: '#4169E1',
+  gold: '#B8860B',
+  purple: '#6B3FA0',
+  brown: '#8B4513',
+  gray: '#708090',
+  parchmentDark: '#DDD0B8',
+  parchment: '#E8D9B5',
+  parchmentLight: '#F5EDE0',
+  inkDark: '#2F1810',
+  inkLight: '#6B4423',
+  tan: '#C4A574',
+  white: '#FFFFFF',
+  black: '#000000',
+} as const;
+
+export const darkPalette = {
+  red: '#E05555',
+  green: '#5DAE72',
+  blue: '#6B8FE8',
+  gold: '#DAA520',
+  purple: '#9D7FD0',
+  brown: '#A0724E',
+  gray: '#8899A5',
+  stoneDark: '#1C1C1C',
+  stone: '#2D2D2D',
+  stoneLight: '#3D3D3D',
+  parchmentLight: '#E8DCC4',
+  parchmentFaded: '#9A8C7B',
+  stoneBorder: '#4A4A4A',
+  white: '#FFFFFF',
+  black: '#000000',
+} as const;
