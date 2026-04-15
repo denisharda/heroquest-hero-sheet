@@ -13,15 +13,27 @@ import { useTheme } from '@/theme/ThemeContext';
 import { useHeroList } from '@/hooks/useHero';
 import { HERO_CLASSES, HERO_CLASS_NAMES } from '@/data/heroes';
 import { SPELL_SCHOOLS, getSpellsForSchool } from '@/data/spells';
-import { HeroClassName, SpellSchool } from '@/types';
+import { ThemeColors, HeroClassName, SpellSchool } from '@/types';
 import * as Haptics from 'expo-haptics';
 
-// Spell school colors
-const SCHOOL_COLORS: Record<SpellSchool, string> = {
-  Air: '#87CEEB',
-  Earth: '#8B4513',
-  Fire: '#FF4500',
-  Water: '#4169E1',
+const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
+  const map: Record<SpellSchool, string> = {
+    Fire: colors.spellFire,
+    Water: colors.spellWater,
+    Earth: colors.spellEarth,
+    Air: colors.spellAir,
+  };
+  return map[school];
+};
+
+const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
+  const map: Record<HeroClassName, string> = {
+    Barbarian: colors.classBarbarian,
+    Dwarf: colors.classDwarf,
+    Elf: colors.classElf,
+    Wizard: colors.classWizard,
+  };
+  return map[className];
 };
 
 // Spell school icons
@@ -222,10 +234,10 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                 styles.classOption,
                 {
                   backgroundColor: isSelected
-                    ? classData.portraitColor + '30'
+                    ? getClassColor(classData.name, theme.colors) + '30'
                     : theme.colors.surface,
                   borderColor: isSelected
-                    ? classData.portraitColor
+                    ? getClassColor(classData.name, theme.colors)
                     : theme.colors.border,
                 },
               ]}
@@ -234,7 +246,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
               <View
                 style={[
                   styles.classIcon,
-                  { backgroundColor: classData.portraitColor },
+                  { backgroundColor: getClassColor(classData.name, theme.colors) },
                 ]}
               >
                 <Text style={styles.classIconText}>
@@ -250,7 +262,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                 {className}
               </Text>
               {isSelected && (
-                <Ionicons name="checkmark" size={20} color={classData.portraitColor} />
+                <Ionicons name="checkmark" size={20} color={getClassColor(classData.name, theme.colors)} />
               )}
             </Pressable>
           );
@@ -302,7 +314,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
           <View
             style={[
               styles.spellHeaderIcon,
-              { backgroundColor: classData.portraitColor },
+              { backgroundColor: getClassColor(classData.name, theme.colors) },
             ]}
           >
             <Text style={styles.spellHeaderIconText}>
@@ -327,7 +339,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
           {SPELL_SCHOOLS.map((school) => {
             const isSelected = selectedSchools.includes(school);
             const spells = getSpellsForSchool(school);
-            const schoolColor = SCHOOL_COLORS[school];
+            const schoolColor = getSchoolColor(school, theme.colors);
 
             return (
               <Pressable
@@ -490,7 +502,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                       <View
                         style={[
                           styles.heroPortrait,
-                          { backgroundColor: classData.portraitColor },
+                          { backgroundColor: getClassColor(classData.name, theme.colors) },
                         ]}
                       >
                         <Text style={styles.heroPortraitText}>
