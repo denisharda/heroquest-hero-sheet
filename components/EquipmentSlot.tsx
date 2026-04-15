@@ -90,7 +90,7 @@ export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
       <Pressable
         onPress={handlePress}
         style={[styles.slot, slotType === 'helmet' ? styles.slotHelmet : styles.slotMiddle, {
-          backgroundColor: theme.isDark ? '#1a1a1a' : theme.colors.surfaceVariant,
+          backgroundColor: theme.colors.surfaceVariant,
           borderColor: withOpacity(theme.colors.border, 0.50),
           borderStyle: 'dashed' as any,
           borderWidth: 1.5,

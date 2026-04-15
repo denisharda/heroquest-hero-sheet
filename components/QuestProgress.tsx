@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { QUESTS } from '@/data/quests';
+import { OVERLAY_COLORS } from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
 
 const TOTAL_QUESTS = 14;
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 8,
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: OVERLAY_COLORS.pressedOverlay,
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 16,

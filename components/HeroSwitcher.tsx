@@ -714,7 +714,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: withOpacity(theme.colors.textOnAccent, 0.06),
   },
   spellHeaderIcon: {
     width: 48,

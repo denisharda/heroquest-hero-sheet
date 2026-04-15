@@ -164,6 +164,6 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5E6C8',
+    backgroundColor: '#E8D9B5',
   },
 });

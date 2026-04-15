@@ -11,6 +11,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { withOpacity } from '@/theme/colorUtils';
+import { OVERLAY_COLORS } from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
 
 export const GoldCounter: React.FC = () => {
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: OVERLAY_COLORS.modalOverlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
