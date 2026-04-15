@@ -1,4 +1,5 @@
 import { HeroClassStats, HeroClassName } from '@/types';
+import { lightPalette } from '@/theme/palette';
 
 export const HERO_CLASSES: Record<HeroClassName, HeroClassStats> = {
   Barbarian: {
@@ -9,7 +10,7 @@ export const HERO_CLASSES: Record<HeroClassName, HeroClassStats> = {
     bodyPoints: 8,
     mindPoints: 2,
     canCastSpells: false,
-    portraitColor: '#C41E3A', // Red
+    portraitColor: lightPalette.red,
     portraitInitial: 'B',
   },
   Dwarf: {
@@ -20,7 +21,7 @@ export const HERO_CLASSES: Record<HeroClassName, HeroClassStats> = {
     bodyPoints: 7,
     mindPoints: 3,
     canCastSpells: false,
-    portraitColor: '#8B4513', // Brown
+    portraitColor: lightPalette.brown,
     portraitInitial: 'D',
   },
   Elf: {
@@ -31,7 +32,7 @@ export const HERO_CLASSES: Record<HeroClassName, HeroClassStats> = {
     bodyPoints: 6,
     mindPoints: 4,
     canCastSpells: true,
-    portraitColor: '#228B22', // Green
+    portraitColor: lightPalette.green,
     portraitInitial: 'E',
   },
   Wizard: {
@@ -42,7 +43,7 @@ export const HERO_CLASSES: Record<HeroClassName, HeroClassStats> = {
     bodyPoints: 4,
     mindPoints: 6,
     canCastSpells: true,
-    portraitColor: '#4169E1', // Blue
+    portraitColor: lightPalette.blue,
     portraitInitial: 'W',
   },
 };
