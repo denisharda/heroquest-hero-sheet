@@ -164,23 +164,60 @@ export interface HistoryEntry {
 export type ThemeName = 'fantasy' | 'darkFantasy';
 
 export interface ThemeColors {
+  // Foundation
   primary: string;
   secondary: string;
+
+  // Surfaces
   background: string;
   surface: string;
   surfaceVariant: string;
+
+  // Text
   text: string;
   textSecondary: string;
+  textOnAccent: string;
+
+  // Borders
   border: string;
+
+  // Accents
   accent: string;
   accentSecondary: string;
+
+  // Health/Mind points
   health: string;
   healthEmpty: string;
   mind: string;
   mindEmpty: string;
+
+  // Utility
   gold: string;
   danger: string;
   success: string;
+
+  // Stat icons
+  attack: string;
+  defend: string;
+  move: string;
+
+  // Class portraits
+  classBarbarian: string;
+  classDwarf: string;
+  classElf: string;
+  classWizard: string;
+
+  // Spell schools
+  spellFire: string;
+  spellWater: string;
+  spellEarth: string;
+  spellAir: string;
+
+  // Item categories
+  itemPotion: string;
+  itemTool: string;
+  itemArtifact: string;
+  itemMisc: string;
 }
 
 export interface Theme {
