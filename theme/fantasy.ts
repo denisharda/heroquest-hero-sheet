@@ -1,37 +1,63 @@
 import { Theme } from '@/types';
+import { lightPalette as p } from './palette';
 
 export const fantasyTheme: Theme = {
   name: 'fantasy',
   isDark: false,
-  // No texture for light theme - using solid old paper color
   colors: {
-    // Primary colors - warm medieval feel
-    primary: '#8B4513',       // Saddle Brown
-    secondary: '#DAA520',     // Goldenrod
+    // Foundation
+    primary: p.brown,
+    secondary: p.gold,
 
-    // Backgrounds - aged paper tones
-    background: '#E8D9B5',    // Old paper / aged parchment
-    surface: '#F5EDE0',       // Lighter aged paper
-    surfaceVariant: '#DDD0B8', // Darker aged paper
+    // Surfaces
+    background: p.parchment,
+    surface: p.parchmentLight,
+    surfaceVariant: p.parchmentDark,
 
     // Text
-    text: '#2F1810',          // Dark brown
-    textSecondary: '#6B4423', // Medium brown
+    text: p.inkDark,
+    textSecondary: p.inkLight,
+    textOnAccent: p.white,
 
-    // Borders and accents
-    border: '#C4A574',        // Tan border
-    accent: '#B8860B',        // Dark Goldenrod
-    accentSecondary: '#CD853F', // Peru
+    // Borders
+    border: p.tan,
 
-    // Health/Mind points
-    health: '#C41E3A',        // Red
-    healthEmpty: '#D9C5C5',   // Faded red/pink
-    mind: '#6B3FA0',          // Mystical purple
-    mindEmpty: '#D5C5D9',     // Faded purple
+    // Accents
+    accent: p.gold,
+    accentSecondary: p.brown,
 
-    // Utility colors
-    gold: '#B8860B',          // Dark Goldenrod (readable on parchment)
-    danger: '#8B0000',        // Dark Red
-    success: '#228B22',       // Forest Green
+    // Health/Mind
+    health: p.red,
+    healthEmpty: '#D9C5C5',
+    mind: p.purple,
+    mindEmpty: '#D5C5D9',
+
+    // Utility
+    gold: p.gold,
+    danger: p.red,
+    success: p.green,
+
+    // Stat icons
+    attack: p.red,
+    defend: p.blue,
+    move: p.green,
+
+    // Class portraits
+    classBarbarian: p.red,
+    classDwarf: p.brown,
+    classElf: p.green,
+    classWizard: p.blue,
+
+    // Spell schools
+    spellFire: p.red,
+    spellWater: p.blue,
+    spellEarth: p.brown,
+    spellAir: p.blue,
+
+    // Item categories
+    itemPotion: p.purple,
+    itemTool: p.gold,
+    itemArtifact: p.purple,
+    itemMisc: p.gray,
   },
 };

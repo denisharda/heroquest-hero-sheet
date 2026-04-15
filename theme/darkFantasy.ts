@@ -1,37 +1,63 @@
 import { Theme } from '@/types';
+import { darkPalette as p } from './palette';
 
 export const darkFantasyTheme: Theme = {
   name: 'darkFantasy',
   isDark: true,
-  // No texture - using solid dark fantasy color
   colors: {
-    // Primary colors - gothic dungeon feel
-    primary: '#8B0000',       // Dark blood red
-    secondary: '#4A0E4E',     // Deep purple
+    // Foundation
+    primary: p.red,
+    secondary: p.purple,
 
-    // Backgrounds - stone dungeon colors
-    background: '#1C1C1C',    // Charcoal black
-    surface: '#2D2D2D',       // Dark stone gray
-    surfaceVariant: '#3D3D3D', // Lighter stone gray
+    // Surfaces
+    background: p.stoneDark,
+    surface: p.stone,
+    surfaceVariant: p.stoneLight,
 
-    // Text - parchment tones
-    text: '#E8DCC4',          // Aged parchment
-    textSecondary: '#9A8C7B', // Faded parchment
+    // Text
+    text: p.parchmentLight,
+    textSecondary: p.parchmentFaded,
+    textOnAccent: p.white,
 
-    // Borders and accents - aged gold/bronze
-    border: '#4A4A4A',        // Stone border
-    accent: '#C9A227',        // Antique gold
-    accentSecondary: '#8B6914', // Dark bronze
+    // Borders
+    border: p.stoneBorder,
 
-    // Health/Mind points
-    health: '#B22222',        // Firebrick red (blood)
-    healthEmpty: '#3D2020',   // Dried blood
-    mind: '#6B3FA0',          // Mystical purple
-    mindEmpty: '#2D1F3D',     // Dark purple shadow
+    // Accents
+    accent: p.gold,
+    accentSecondary: p.brown,
 
-    // Utility colors
-    gold: '#DAA520',          // Goldenrod (treasure)
-    danger: '#E05555',        // Lighter red (readable on dark surfaces)
-    success: '#5DAE72',       // Lighter green (readable on dark surfaces)
+    // Health/Mind
+    health: p.red,
+    healthEmpty: '#3D2020',
+    mind: p.purple,
+    mindEmpty: '#2D1F3D',
+
+    // Utility
+    gold: p.gold,
+    danger: p.red,
+    success: p.green,
+
+    // Stat icons
+    attack: p.red,
+    defend: p.blue,
+    move: p.green,
+
+    // Class portraits
+    classBarbarian: p.red,
+    classDwarf: p.brown,
+    classElf: p.green,
+    classWizard: p.blue,
+
+    // Spell schools
+    spellFire: p.red,
+    spellWater: p.blue,
+    spellEarth: p.brown,
+    spellAir: p.blue,
+
+    // Item categories
+    itemPotion: p.purple,
+    itemTool: p.gold,
+    itemArtifact: p.purple,
+    itemMisc: p.gray,
   },
 };
