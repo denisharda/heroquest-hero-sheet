@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   providerButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
   },
   skipButton: {
     marginTop: 16,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   primaryButtonText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

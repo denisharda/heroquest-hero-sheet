@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   categoryBadgeText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',
     marginLeft: 6,

@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   addButtonText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,

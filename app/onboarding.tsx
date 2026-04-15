@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
   primaryButtonText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
   },

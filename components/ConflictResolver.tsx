@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   resolveButtonText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

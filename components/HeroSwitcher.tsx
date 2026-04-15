@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroPortraitText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   createButtonText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   classIconText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -714,7 +714,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: withOpacity(theme.colors.textOnAccent, 0.06),
+    borderBottomColor: withOpacity('#FFFFFF', 0.06),
   },
   spellHeaderIcon: {
     width: 48,
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spellHeaderIconText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: 'bold',
   },

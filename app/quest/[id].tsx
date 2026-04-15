@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusBadgeText: {
-    color: theme.colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
     marginLeft: 6,
