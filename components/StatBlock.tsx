@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { SHARED_COLORS } from '@/constants/colors';
 
 interface StatBoxProps {
   icon: React.ReactNode;
@@ -50,39 +49,39 @@ export const StatBlock: React.FC = () => {
           <MaterialCommunityIcons
             name="sword-cross"
             size={20}
-            color={SHARED_COLORS.attackIcon}
+            color={theme.colors.attack}
           />
         }
         label="ATTACK"
         value={computedStats.totalAttack}
         breakdown={computedStats.attackBreakdown}
-        color={SHARED_COLORS.attackIcon}
+        color={theme.colors.attack}
       />
       <StatBox
         icon={
           <FontAwesome5
             name="shield-alt"
             size={18}
-            color={SHARED_COLORS.defendIcon}
+            color={theme.colors.defend}
           />
         }
         label="DEFENSE"
         value={computedStats.totalDefend}
         breakdown={computedStats.defendBreakdown}
-        color={SHARED_COLORS.defendIcon}
+        color={theme.colors.defend}
       />
       <StatBox
         icon={
           <MaterialCommunityIcons
             name="run-fast"
             size={20}
-            color={SHARED_COLORS.moveIcon}
+            color={theme.colors.move}
           />
         }
         label="MOVE"
         value={`${computedStats.moveDice}d6`}
         breakdown={computedStats.moveBreakdown}
-        color={SHARED_COLORS.moveIcon}
+        color={theme.colors.move}
       />
       <StatBox
         icon={
