@@ -6,6 +6,7 @@ import Animated, {
   withRepeat,
   withTiming,
   Easing,
+  SharedValue,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
@@ -53,7 +54,7 @@ function SlotIcon({ slotType, color, opacity }: { slotType: SlotType; color: str
   return <MaterialCommunityIcons name={config.name as any} size={config.size} color={color} style={{ opacity }} />;
 }
 
-function useArtifactPulse(isArtifact: boolean): Animated.SharedValue<number> {
+function useArtifactPulse(isArtifact: boolean): SharedValue<number> {
   const glowOpacity = useSharedValue(0.15);
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -66,7 +67,7 @@ function useArtifactPulse(isArtifact: boolean): Animated.SharedValue<number> {
   useEffect(() => {
     if (isArtifact && !reduceMotion) {
       glowOpacity.value = withRepeat(
-        withTiming(0.4, { duration: 1500, easing: Easing.inOut(Easing.sine) }),
+        withTiming(0.4, { duration: 1500, easing: Easing.inOut(Easing.sin) }),
         -1,
         true
       );
