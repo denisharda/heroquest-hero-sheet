@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
+import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { getSpellsBySchool, SPELL_SCHOOLS } from '@/data/spells';
 import { SpellSchool, Spell, ThemeColors } from '@/types';
@@ -171,7 +172,7 @@ export const SpellTracker: React.FC = () => {
             <Pressable
               style={[
                 styles.resetButton,
-                { backgroundColor: theme.colors.accent + '30' },
+                { backgroundColor: withOpacity(theme.colors.accent, 0.19) },
               ]}
               onPress={handleReset}
             >

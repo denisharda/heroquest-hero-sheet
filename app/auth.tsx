@@ -15,6 +15,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useSync } from '@/hooks/useSync';
+import { withOpacity } from '@/theme/colorUtils';
 
 type AuthMode = 'choice' | 'signin' | 'signup';
 
@@ -150,7 +151,7 @@ export default function AuthScreen() {
               </Text>
             </View>
             <Pressable
-              style={[styles.syncButton, { backgroundColor: theme.colors.accent + '20' }]}
+              style={[styles.syncButton, { backgroundColor: withOpacity(theme.colors.accent, 0.13) }]}
               onPress={syncNow}
               disabled={isSyncing}
             >
@@ -234,7 +235,7 @@ export default function AuthScreen() {
 
         <ScrollView contentContainerStyle={styles.content}>
           {error && (
-            <View style={[styles.errorBox, { backgroundColor: theme.colors.danger + '20' }]}>
+            <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
               <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
             </View>
           )}
@@ -351,7 +352,7 @@ export default function AuthScreen() {
         </Text>
 
         {error && (
-          <View style={[styles.errorBox, { backgroundColor: theme.colors.danger + '20' }]}>
+          <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
             <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
           </View>
         )}

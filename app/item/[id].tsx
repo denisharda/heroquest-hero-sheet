@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { ItemCategory, ThemeColors } from '@/types';
+import { withOpacity } from '@/theme/colorUtils';
 import * as Haptics from 'expo-haptics';
 
 const getCategoryColor = (category: ItemCategory, colors: ThemeColors): string => {
@@ -155,7 +156,7 @@ export default function ItemDetailScreen() {
               <Pressable
                 style={[
                   styles.quantityButton,
-                  { backgroundColor: theme.colors.danger + '20' },
+                  { backgroundColor: withOpacity(theme.colors.danger, 0.13) },
                 ]}
                 onPress={() => handleAdjustQuantity(-1)}
               >
@@ -169,7 +170,7 @@ export default function ItemDetailScreen() {
               <Pressable
                 style={[
                   styles.quantityButton,
-                  { backgroundColor: theme.colors.success + '20' },
+                  { backgroundColor: withOpacity(theme.colors.success, 0.13) },
                 ]}
                 onPress={() => handleAdjustQuantity(1)}
               >
@@ -181,7 +182,7 @@ export default function ItemDetailScreen() {
           </View>
 
           {/* Divider */}
-          <View style={[styles.divider, { backgroundColor: categoryColor + '40' }]} />
+          <View style={[styles.divider, { backgroundColor: withOpacity(categoryColor, 0.25) }]} />
 
           {/* Description */}
           <Text style={[styles.descriptionLabel, { color: theme.colors.textSecondary }]}>
@@ -193,7 +194,7 @@ export default function ItemDetailScreen() {
 
           {/* Gold Cost (if applicable) */}
           {item.goldCost > 0 && (
-            <View style={[styles.goldBox, { backgroundColor: theme.colors.gold + '20' }]}>
+            <View style={[styles.goldBox, { backgroundColor: withOpacity(theme.colors.gold, 0.13) }]}>
               <MaterialCommunityIcons
                 name="gold"
                 size={20}
@@ -240,7 +241,7 @@ export default function ItemDetailScreen() {
             style={[
               styles.useButton,
               {
-                backgroundColor: theme.colors.success + '20',
+                backgroundColor: withOpacity(theme.colors.success, 0.13),
                 borderColor: theme.colors.success,
               },
             ]}
@@ -261,7 +262,7 @@ export default function ItemDetailScreen() {
           style={[
             styles.removeButton,
             {
-              backgroundColor: theme.colors.danger + '20',
+              backgroundColor: withOpacity(theme.colors.danger, 0.13),
               borderColor: theme.colors.danger,
             },
           ]}

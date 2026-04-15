@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetFlatList, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
+import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { WEAPONS } from '@/data/weapons';
 import { NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
@@ -193,7 +194,7 @@ export const EquipmentSelector: React.FC = () => {
                   styles.itemOption,
                   {
                     backgroundColor: isSelected
-                      ? theme.colors.accent + '30'
+                      ? withOpacity(theme.colors.accent, 0.19)
                       : theme.colors.surface,
                     borderColor: theme.colors.border,
                   },

@@ -10,6 +10,7 @@ import { useHero } from '@/hooks/useHero';
 import { PlaceholderPortrait } from './PlaceholderPortrait';
 import { HERO_CLASSES } from '@/data/heroes';
 import { HeroClassName, ThemeColors } from '@/types';
+import { withOpacity } from '@/theme/colorUtils';
 
 const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
   const map: Record<HeroClassName, string> = {
@@ -66,7 +67,7 @@ export const HeroIdentity: React.FC = () => {
             style={[
               styles.classDisplay,
               {
-                backgroundColor: getClassColor(classData.name, theme.colors) + '20',
+                backgroundColor: withOpacity(getClassColor(classData.name, theme.colors), 0.13),
                 borderColor: getClassColor(classData.name, theme.colors),
               },
             ]}

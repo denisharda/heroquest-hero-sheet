@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { SpellSchool, ThemeColors } from '@/types';
+import { withOpacity } from '@/theme/colorUtils';
 import * as Haptics from 'expo-haptics';
 
 const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
@@ -127,7 +128,7 @@ export default function SpellDetailScreen() {
 
           {/* Used Status */}
           {spell.used && (
-            <View style={[styles.usedBadge, { backgroundColor: theme.colors.danger + '30' }]}>
+            <View style={[styles.usedBadge, { backgroundColor: withOpacity(theme.colors.danger, 0.19) }]}>
               <MaterialCommunityIcons
                 name="check-circle"
                 size={16}
@@ -140,7 +141,7 @@ export default function SpellDetailScreen() {
           )}
 
           {/* Divider */}
-          <View style={[styles.divider, { backgroundColor: schoolColor + '40' }]} />
+          <View style={[styles.divider, { backgroundColor: withOpacity(schoolColor, 0.25) }]} />
 
           {/* Description */}
           <Text style={[styles.descriptionLabel, { color: theme.colors.textSecondary }]}>
@@ -169,8 +170,8 @@ export default function SpellDetailScreen() {
             styles.toggleButton,
             {
               backgroundColor: spell.used
-                ? theme.colors.success + '20'
-                : theme.colors.danger + '20',
+                ? withOpacity(theme.colors.success, 0.13)
+                : withOpacity(theme.colors.danger, 0.13),
               borderColor: spell.used ? theme.colors.success : theme.colors.danger,
             },
           ]}

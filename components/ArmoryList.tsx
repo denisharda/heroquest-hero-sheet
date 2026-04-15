@@ -9,6 +9,7 @@ import {
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetSectionList, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
+import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { getAvailableWeapons, WEAPONS } from '@/data/weapons';
 import { getAvailableShields, getAvailableHelmets, getAvailableArmor } from '@/data/armor';
@@ -54,7 +55,7 @@ const OwnedItemRow: React.FC<OwnedItemRowProps> = ({ item, slot, isEquipped, sta
         <Text style={[styles.itemStat, { color: theme.colors.accent }]}>{statLabel}</Text>
       </View>
       {isEquipped && (
-        <View style={[styles.equippedBadge, { backgroundColor: theme.colors.accent + '30' }]}>
+        <View style={[styles.equippedBadge, { backgroundColor: withOpacity(theme.colors.accent, 0.19) }]}>
           <Text style={[styles.equippedText, { color: theme.colors.accent }]}>Equipped</Text>
         </View>
       )}
@@ -248,7 +249,7 @@ export const ArmoryList: React.FC = () => {
               </View>
 
               <View style={styles.detailBadgeRow}>
-                <View style={[styles.typeBadge, { backgroundColor: theme.colors.accent + '30' }]}>
+                <View style={[styles.typeBadge, { backgroundColor: withOpacity(theme.colors.accent, 0.19) }]}>
                   <Text style={[styles.typeBadgeText, { color: theme.colors.accent }]}>
                     {detailItem.slot.charAt(0).toUpperCase() + detailItem.slot.slice(1)}
                   </Text>
@@ -294,7 +295,7 @@ export const ArmoryList: React.FC = () => {
                     {
                       backgroundColor: isEquipped(detailItem.slot, detailItem.item.id)
                         ? theme.colors.surface
-                        : theme.colors.danger + '20',
+                        : withOpacity(theme.colors.danger, 0.13),
                       borderColor: isEquipped(detailItem.slot, detailItem.item.id)
                         ? theme.colors.border
                         : theme.colors.danger,

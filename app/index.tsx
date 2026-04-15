@@ -11,6 +11,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
+import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { useAuth } from '@/hooks/useAuth';
@@ -285,7 +286,7 @@ export default function CharacterSheet() {
             styles.actionButton,
             {
               backgroundColor: canUndo
-                ? theme.colors.accent + '20'
+                ? withOpacity(theme.colors.accent, 0.13)
                 : theme.colors.surfaceVariant,
               opacity: canUndo ? 1 : 0.5,
             },
@@ -315,7 +316,7 @@ export default function CharacterSheet() {
             styles.actionButton,
             {
               backgroundColor: canRedo
-                ? theme.colors.accent + '20'
+                ? withOpacity(theme.colors.accent, 0.13)
                 : theme.colors.surfaceVariant,
               opacity: canRedo ? 1 : 0.5,
             },

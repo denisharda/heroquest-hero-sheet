@@ -10,6 +10,7 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
+import { withOpacity } from '@/theme/colorUtils';
 import { useHeroList } from '@/hooks/useHero';
 import { HERO_CLASSES, HERO_CLASS_NAMES } from '@/data/heroes';
 import { SPELL_SCHOOLS, getSpellsForSchool } from '@/data/spells';
@@ -234,7 +235,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                 styles.classOption,
                 {
                   backgroundColor: isSelected
-                    ? getClassColor(classData.name, theme.colors) + '30'
+                    ? withOpacity(getClassColor(classData.name, theme.colors), 0.19)
                     : theme.colors.surface,
                   borderColor: isSelected
                     ? getClassColor(classData.name, theme.colors)
@@ -348,7 +349,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                   styles.schoolOption,
                   {
                     backgroundColor: isSelected
-                      ? schoolColor + '30'
+                      ? withOpacity(schoolColor, 0.19)
                       : theme.colors.surface,
                     borderColor: isSelected ? schoolColor : theme.colors.border,
                   },
@@ -490,7 +491,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                         styles.heroItem,
                         {
                           backgroundColor: isSelected
-                            ? theme.colors.accent + '20'
+                            ? withOpacity(theme.colors.accent, 0.13)
                             : theme.colors.surface,
                           borderColor: isSelected
                             ? theme.colors.accent

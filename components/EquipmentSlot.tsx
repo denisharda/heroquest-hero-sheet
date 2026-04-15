@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot as SlotType } from '@/types';
+import { withOpacity } from '@/theme/colorUtils';
 import * as Haptics from 'expo-haptics';
 
 type EquipmentItem = Weapon | Shield | Helmet | Armor;
@@ -66,7 +67,7 @@ export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
     return (
       <View style={[styles.slot, styles.slotMiddle, {
         backgroundColor: theme.colors.surface,
-        borderColor: theme.colors.border + '40',
+        borderColor: withOpacity(theme.colors.border, 0.25),
         borderStyle: 'dashed' as any,
         borderWidth: 1.5,
         opacity: 0.5,
@@ -90,16 +91,16 @@ export const EquipmentSlotCard: React.FC<EquipmentSlotProps> = ({
         onPress={handlePress}
         style={[styles.slot, slotType === 'helmet' ? styles.slotHelmet : styles.slotMiddle, {
           backgroundColor: theme.isDark ? '#1a1a1a' : theme.colors.surfaceVariant,
-          borderColor: theme.colors.border + '80',
+          borderColor: withOpacity(theme.colors.border, 0.50),
           borderStyle: 'dashed' as any,
           borderWidth: 1.5,
         }]}
       >
         <SlotIcon slotType={slotType} color={theme.colors.textSecondary} opacity={0.3} />
-        <Text style={[styles.slotLabel, { color: theme.colors.textSecondary + '80' }]}>
+        <Text style={[styles.slotLabel, { color: withOpacity(theme.colors.textSecondary, 0.50) }]}>
           {SLOT_LABELS[slotType]}
         </Text>
-        <Text style={[styles.emptyName, { color: theme.colors.textSecondary + '60' }]}>
+        <Text style={[styles.emptyName, { color: withOpacity(theme.colors.textSecondary, 0.38) }]}>
           No {SLOT_LABELS[slotType].toLowerCase()}
         </Text>
       </Pressable>

@@ -10,6 +10,7 @@ import {
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
+import { withOpacity } from '@/theme/colorUtils';
 import * as Haptics from 'expo-haptics';
 
 export const GoldCounter: React.FC = () => {
@@ -52,7 +53,7 @@ export const GoldCounter: React.FC = () => {
         <Pressable
           style={[
             styles.adjustButton,
-            { backgroundColor: theme.colors.danger + '30' },
+            { backgroundColor: withOpacity(theme.colors.danger, 0.19) },
           ]}
           onPress={() => handleAdjust(-10)}
           onLongPress={() => handleAdjust(-100)}
@@ -65,7 +66,7 @@ export const GoldCounter: React.FC = () => {
         <Pressable
           style={[
             styles.adjustButton,
-            { backgroundColor: theme.colors.danger + '20' },
+            { backgroundColor: withOpacity(theme.colors.danger, 0.13) },
           ]}
           onPress={() => handleAdjust(-1)}
         >
@@ -89,7 +90,7 @@ export const GoldCounter: React.FC = () => {
         <Pressable
           style={[
             styles.adjustButton,
-            { backgroundColor: theme.colors.success + '20' },
+            { backgroundColor: withOpacity(theme.colors.success, 0.13) },
           ]}
           onPress={() => handleAdjust(1)}
         >
@@ -101,7 +102,7 @@ export const GoldCounter: React.FC = () => {
         <Pressable
           style={[
             styles.adjustButton,
-            { backgroundColor: theme.colors.success + '30' },
+            { backgroundColor: withOpacity(theme.colors.success, 0.19) },
           ]}
           onPress={() => handleAdjust(10)}
           onLongPress={() => handleAdjust(100)}

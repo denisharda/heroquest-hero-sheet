@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { getQuestById } from '@/data/quests';
+import { withOpacity } from '@/theme/colorUtils';
 import * as Haptics from 'expo-haptics';
 
 export default function QuestDetailScreen() {
@@ -140,8 +141,8 @@ export default function QuestDetailScreen() {
             styles.toggleButton,
             {
               backgroundColor: isCompleted
-                ? theme.colors.danger + '20'
-                : theme.colors.success + '20',
+                ? withOpacity(theme.colors.danger, 0.13)
+                : withOpacity(theme.colors.success, 0.13),
               borderColor: isCompleted
                 ? theme.colors.danger
                 : theme.colors.success,

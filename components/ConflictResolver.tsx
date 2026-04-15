@@ -11,6 +11,7 @@ import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView } from '@g
 import { useTheme } from '@/theme/ThemeContext';
 import { Hero, HeroConflict } from '@/types';
 import { HERO_CLASSES } from '@/data/heroes';
+import { withOpacity } from '@/theme/colorUtils';
 
 interface ConflictResolverProps {
   conflicts: HeroConflict[];
@@ -177,7 +178,7 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
                         {
                           borderColor: selected === 'remote' ? theme.colors.accent : theme.colors.border,
                           borderWidth: selected === 'remote' ? 2 : 1,
-                          backgroundColor: selected === 'remote' ? theme.colors.accent + '10' : 'transparent',
+                          backgroundColor: selected === 'remote' ? withOpacity(theme.colors.accent, 0.06) : 'transparent',
                         },
                       ]}
                       onPress={() => setChoice(conflict.heroId, 'remote')}
@@ -201,7 +202,7 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
                         {
                           borderColor: selected === 'local' ? theme.colors.danger : theme.colors.border,
                           borderWidth: selected === 'local' ? 2 : 1,
-                          backgroundColor: selected === 'local' ? theme.colors.danger + '10' : 'transparent',
+                          backgroundColor: selected === 'local' ? withOpacity(theme.colors.danger, 0.06) : 'transparent',
                         },
                       ]}
                       onPress={() => setChoice(conflict.heroId, 'local')}
@@ -225,7 +226,7 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
                         {
                           borderColor: selected === 'local' ? theme.colors.accent : theme.colors.border,
                           borderWidth: selected === 'local' ? 2 : 1,
-                          backgroundColor: selected === 'local' ? theme.colors.accent + '10' : 'transparent',
+                          backgroundColor: selected === 'local' ? withOpacity(theme.colors.accent, 0.06) : 'transparent',
                         },
                       ]}
                       onPress={() => setChoice(conflict.heroId, 'local')}
@@ -252,7 +253,7 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
                         {
                           borderColor: selected === 'remote' ? theme.colors.accent : theme.colors.border,
                           borderWidth: selected === 'remote' ? 2 : 1,
-                          backgroundColor: selected === 'remote' ? theme.colors.accent + '10' : 'transparent',
+                          backgroundColor: selected === 'remote' ? withOpacity(theme.colors.accent, 0.06) : 'transparent',
                         },
                       ]}
                       onPress={() => setChoice(conflict.heroId, 'remote')}
