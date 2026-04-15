@@ -11,9 +11,18 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { SPELL_SCHOOL_COLORS } from '@/constants/colors';
-import { SpellSchool } from '@/types';
+import { SpellSchool, ThemeColors } from '@/types';
 import * as Haptics from 'expo-haptics';
+
+const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
+  const map: Record<SpellSchool, string> = {
+    Fire: colors.spellFire,
+    Water: colors.spellWater,
+    Earth: colors.spellEarth,
+    Air: colors.spellAir,
+  };
+  return map[school];
+};
 
 const SCHOOL_ICONS: Record<SpellSchool, keyof typeof MaterialCommunityIcons.glyphMap> = {
   Air: 'weather-windy',
@@ -41,7 +50,7 @@ export default function SpellDetailScreen() {
     );
   }
 
-  const schoolColor = SPELL_SCHOOL_COLORS[spell.school];
+  const schoolColor = getSchoolColor(spell.school, theme.colors);
   const schoolIcon = SCHOOL_ICONS[spell.school];
 
   const handleToggleUsed = async () => {

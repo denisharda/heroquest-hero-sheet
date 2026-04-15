@@ -4,10 +4,19 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { SPELL_SCHOOL_COLORS } from '@/constants/colors';
 import { getSpellsBySchool, SPELL_SCHOOLS } from '@/data/spells';
-import { SpellSchool, Spell } from '@/types';
+import { SpellSchool, Spell, ThemeColors } from '@/types';
 import * as Haptics from 'expo-haptics';
+
+const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
+  const map: Record<SpellSchool, string> = {
+    Fire: colors.spellFire,
+    Water: colors.spellWater,
+    Earth: colors.spellEarth,
+    Air: colors.spellAir,
+  };
+  return map[school];
+};
 
 interface SpellItemProps {
   spell: Spell;
@@ -17,7 +26,7 @@ interface SpellItemProps {
 
 const SpellItem: React.FC<SpellItemProps> = ({ spell, onToggle, onPress }) => {
   const { theme } = useTheme();
-  const schoolColor = SPELL_SCHOOL_COLORS[spell.school];
+  const schoolColor = getSchoolColor(spell.school, theme.colors);
 
   const handlePress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -84,7 +93,7 @@ const SpellSchoolSection: React.FC<SpellSchoolSectionProps> = ({
   onSpellPress,
 }) => {
   const { theme } = useTheme();
-  const schoolColor = SPELL_SCHOOL_COLORS[school];
+  const schoolColor = getSchoolColor(school, theme.colors);
 
   if (spells.length === 0) return null;
 
