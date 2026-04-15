@@ -9,6 +9,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import { PURE_COLORS } from '@/constants/colors';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 18,
     fontWeight: '600',
   },

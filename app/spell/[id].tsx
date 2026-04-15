@@ -11,19 +11,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
-import { SpellSchool, ThemeColors } from '@/types';
+import { SpellSchool } from '@/types';
 import { withOpacity } from '@/theme/colorUtils';
+import { getSchoolColor } from '@/theme/colorHelpers';
+import { PURE_COLORS } from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
-
-const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
-  const map: Record<SpellSchool, string> = {
-    Fire: colors.spellFire,
-    Water: colors.spellWater,
-    Earth: colors.spellEarth,
-    Air: colors.spellAir,
-  };
-  return map[school];
-};
 
 const SCHOOL_ICONS: Record<SpellSchool, keyof typeof MaterialCommunityIcons.glyphMap> = {
   Air: 'weather-windy',
@@ -249,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   schoolBadgeText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 14,
     fontWeight: '700',
     marginLeft: 6,

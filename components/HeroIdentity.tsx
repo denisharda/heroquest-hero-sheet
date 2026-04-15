@@ -6,21 +6,13 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useTheme } from '@/theme/ThemeContext';
+import { PURE_COLORS } from '@/constants/colors';
 import { useHero } from '@/hooks/useHero';
 import { PlaceholderPortrait } from './PlaceholderPortrait';
 import { HERO_CLASSES } from '@/data/heroes';
-import { HeroClassName, ThemeColors } from '@/types';
+import { HeroClassName } from '@/types';
 import { withOpacity } from '@/theme/colorUtils';
-
-const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
-  const map: Record<HeroClassName, string> = {
-    Barbarian: colors.classBarbarian,
-    Dwarf: colors.classDwarf,
-    Elf: colors.classElf,
-    Wizard: colors.classWizard,
-  };
-  return map[className];
-};
+import { getClassColor } from '@/theme/colorHelpers';
 
 export const HeroIdentity: React.FC = () => {
   const { theme } = useTheme();
@@ -138,7 +130,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   classIconText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 12,
     fontWeight: 'bold',
   },

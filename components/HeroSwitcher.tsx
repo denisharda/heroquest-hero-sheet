@@ -11,31 +11,13 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { withOpacity } from '@/theme/colorUtils';
+import { PURE_COLORS } from '@/constants/colors';
 import { useHeroList } from '@/hooks/useHero';
 import { HERO_CLASSES, HERO_CLASS_NAMES } from '@/data/heroes';
 import { SPELL_SCHOOLS, getSpellsForSchool } from '@/data/spells';
-import { ThemeColors, HeroClassName, SpellSchool } from '@/types';
+import { HeroClassName, SpellSchool } from '@/types';
+import { getSchoolColor, getClassColor } from '@/theme/colorHelpers';
 import * as Haptics from 'expo-haptics';
-
-const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
-  const map: Record<SpellSchool, string> = {
-    Fire: colors.spellFire,
-    Water: colors.spellWater,
-    Earth: colors.spellEarth,
-    Air: colors.spellAir,
-  };
-  return map[school];
-};
-
-const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
-  const map: Record<HeroClassName, string> = {
-    Barbarian: colors.classBarbarian,
-    Dwarf: colors.classDwarf,
-    Elf: colors.classElf,
-    Wizard: colors.classWizard,
-  };
-  return map[className];
-};
 
 // Spell school icons
 const SCHOOL_ICONS: Record<SpellSchool, string> = {
@@ -607,7 +589,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroPortraitText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -636,7 +618,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -679,7 +661,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   classIconText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -714,7 +696,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: withOpacity('#FFFFFF', 0.06),
+    borderBottomColor: withOpacity(PURE_COLORS.white, 0.06),
   },
   spellHeaderIcon: {
     width: 48,
@@ -724,7 +706,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spellHeaderIconText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 20,
     fontWeight: 'bold',
   },

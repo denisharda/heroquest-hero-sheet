@@ -10,6 +10,7 @@ import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-ico
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetSectionList, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { withOpacity } from '@/theme/colorUtils';
+import { PURE_COLORS } from '@/constants/colors';
 import { useHero } from '@/hooks/useHero';
 import { getAvailableWeapons, WEAPONS } from '@/data/weapons';
 import { getAvailableShields, getAvailableHelmets, getAvailableArmor } from '@/data/armor';
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,

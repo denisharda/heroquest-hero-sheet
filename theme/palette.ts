@@ -13,6 +13,8 @@ export const lightPalette = {
   inkDark: '#2F1810',
   inkLight: '#6B4423',
   tan: '#C4A574',
+  healthEmpty: '#D9C5C5',
+  mindEmpty: '#D5C5D9',
   white: '#FFFFFF',
   black: '#000000',
 } as const;
@@ -31,6 +33,8 @@ export const darkPalette = {
   parchmentLight: '#E8DCC4',
   parchmentFaded: '#9A8C7B',
   stoneBorder: '#4A4A4A',
+  healthEmpty: '#3D2020',
+  mindEmpty: '#2D1F3D',
   white: '#FFFFFF',
   black: '#000000',
 } as const;

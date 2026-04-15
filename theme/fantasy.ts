@@ -28,9 +28,9 @@ export const fantasyTheme: Theme = {
 
     // Health/Mind
     health: p.red,
-    healthEmpty: '#D9C5C5',
+    healthEmpty: p.healthEmpty,
     mind: p.purple,
-    mindEmpty: '#D5C5D9',
+    mindEmpty: p.mindEmpty,
 
     // Utility
     gold: p.gold,

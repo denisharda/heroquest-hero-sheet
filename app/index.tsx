@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { withOpacity } from '@/theme/colorUtils';
+import { PURE_COLORS } from '@/constants/colors';
 import { useHero } from '@/hooks/useHero';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { useAuth } from '@/hooks/useAuth';
@@ -496,7 +497,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 18,
     fontWeight: '600',
     marginLeft: 8,

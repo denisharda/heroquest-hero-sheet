@@ -6,23 +6,15 @@ import {
   Pressable,
 } from 'react-native';
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetSectionList } from '@gorhom/bottom-sheet';
+import { PURE_COLORS } from '@/constants/colors';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { ITEM_DEFINITIONS, ITEM_CATEGORIES, createItemInstance } from '@/data/items';
-import { Item, ItemCategory, ThemeColors } from '@/types';
+import { Item, ItemCategory } from '@/types';
+import { getCategoryColor } from '@/theme/colorHelpers';
 import * as Haptics from 'expo-haptics';
-
-const getCategoryColor = (category: ItemCategory, colors: ThemeColors): string => {
-  const map: Record<ItemCategory, string> = {
-    potion: colors.itemPotion,
-    tool: colors.itemTool,
-    artifact: colors.itemArtifact,
-    misc: colors.itemMisc,
-  };
-  return map[category];
-};
 
 interface InventoryItemProps {
   item: Item;
@@ -273,7 +265,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,

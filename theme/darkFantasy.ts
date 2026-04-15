@@ -28,9 +28,9 @@ export const darkFantasyTheme: Theme = {
 
     // Health/Mind
     health: p.red,
-    healthEmpty: '#3D2020',
+    healthEmpty: p.healthEmpty,
     mind: p.purple,
-    mindEmpty: '#2D1F3D',
+    mindEmpty: p.mindEmpty,
 
     // Utility
     gold: p.gold,

@@ -6,18 +6,9 @@ import { useTheme } from '@/theme/ThemeContext';
 import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { getSpellsBySchool, SPELL_SCHOOLS } from '@/data/spells';
-import { SpellSchool, Spell, ThemeColors } from '@/types';
+import { SpellSchool, Spell } from '@/types';
+import { getSchoolColor } from '@/theme/colorHelpers';
 import * as Haptics from 'expo-haptics';
-
-const getSchoolColor = (school: SpellSchool, colors: ThemeColors): string => {
-  const map: Record<SpellSchool, string> = {
-    Fire: colors.spellFire,
-    Water: colors.spellWater,
-    Earth: colors.spellEarth,
-    Air: colors.spellAir,
-  };
-  return map[school];
-};
 
 interface SpellItemProps {
   spell: Spell;

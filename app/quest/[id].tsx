@@ -13,6 +13,7 @@ import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { getQuestById } from '@/data/quests';
 import { withOpacity } from '@/theme/colorUtils';
+import { PURE_COLORS } from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
 
 export default function QuestDetailScreen() {
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusBadgeText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 12,
     fontWeight: '700',
     marginLeft: 6,

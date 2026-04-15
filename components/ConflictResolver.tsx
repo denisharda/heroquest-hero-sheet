@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { PURE_COLORS } from '@/constants/colors';
 import { useTheme } from '@/theme/ThemeContext';
 import { Hero, HeroConflict } from '@/types';
 import { HERO_CLASSES } from '@/data/heroes';
@@ -366,7 +367,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   resolveButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },

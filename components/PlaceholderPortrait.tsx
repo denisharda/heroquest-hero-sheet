@@ -1,18 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { HeroClassName, ThemeColors } from '@/types';
+import { HeroClassName } from '@/types';
 import { HERO_CLASSES } from '@/data/heroes';
 import { useTheme } from '@/theme/ThemeContext';
-
-const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
-  const map: Record<HeroClassName, string> = {
-    Barbarian: colors.classBarbarian,
-    Dwarf: colors.classDwarf,
-    Elf: colors.classElf,
-    Wizard: colors.classWizard,
-  };
-  return map[className];
-};
+import { getClassColor } from '@/theme/colorHelpers';
 
 interface PlaceholderPortraitProps {
   heroClass: HeroClassName;

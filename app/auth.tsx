@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { PURE_COLORS } from '@/constants/colors';
 import { useRouter } from 'expo-router';
 
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -460,7 +461,7 @@ const styles = StyleSheet.create({
   providerButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
   },
   skipButton: {
     marginTop: 16,
@@ -486,7 +487,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: PURE_COLORS.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -547,7 +548,7 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: withOpacity('#000000', 0.3),
+    backgroundColor: withOpacity(PURE_COLORS.black, 0.3),
     justifyContent: 'center',
     alignItems: 'center',
   },
