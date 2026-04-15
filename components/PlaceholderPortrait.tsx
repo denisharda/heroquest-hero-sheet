@@ -1,8 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { HeroClassName } from '@/types';
+import { HeroClassName, ThemeColors } from '@/types';
 import { HERO_CLASSES } from '@/data/heroes';
 import { useTheme } from '@/theme/ThemeContext';
+
+const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
+  const map: Record<HeroClassName, string> = {
+    Barbarian: colors.classBarbarian,
+    Dwarf: colors.classDwarf,
+    Elf: colors.classElf,
+    Wizard: colors.classWizard,
+  };
+  return map[className];
+};
 
 interface PlaceholderPortraitProps {
   heroClass: HeroClassName;
@@ -24,7 +34,7 @@ export const PlaceholderPortrait: React.FC<PlaceholderPortraitProps> = ({
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: classData.portraitColor,
+          backgroundColor: getClassColor(classData.name, theme.colors),
           borderColor: theme.colors.border,
         },
       ]}
@@ -34,7 +44,7 @@ export const PlaceholderPortrait: React.FC<PlaceholderPortraitProps> = ({
           styles.initial,
           {
             fontSize: size * 0.5,
-            color: '#FFFFFF',
+            color: theme.colors.textOnAccent,
           },
         ]}
       >

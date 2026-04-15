@@ -9,6 +9,17 @@ import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { PlaceholderPortrait } from './PlaceholderPortrait';
 import { HERO_CLASSES } from '@/data/heroes';
+import { HeroClassName, ThemeColors } from '@/types';
+
+const getClassColor = (className: HeroClassName, colors: ThemeColors): string => {
+  const map: Record<HeroClassName, string> = {
+    Barbarian: colors.classBarbarian,
+    Dwarf: colors.classDwarf,
+    Elf: colors.classElf,
+    Wizard: colors.classWizard,
+  };
+  return map[className];
+};
 
 export const HeroIdentity: React.FC = () => {
   const { theme } = useTheme();
@@ -55,15 +66,15 @@ export const HeroIdentity: React.FC = () => {
             style={[
               styles.classDisplay,
               {
-                backgroundColor: classData.portraitColor + '20',
-                borderColor: classData.portraitColor,
+                backgroundColor: getClassColor(classData.name, theme.colors) + '20',
+                borderColor: getClassColor(classData.name, theme.colors),
               },
             ]}
           >
             <View
               style={[
                 styles.classIcon,
-                { backgroundColor: classData.portraitColor },
+                { backgroundColor: getClassColor(classData.name, theme.colors) },
               ]}
             >
               <Text style={styles.classIconText}>
