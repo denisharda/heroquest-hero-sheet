@@ -167,7 +167,7 @@ export default function OnboardingScreen() {
               style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
               onPress={handleSignIn}
             >
-              <Ionicons name="cloud-download-outline" size={22} color="#FFFFFF" />
+              <Ionicons name="cloud-download-outline" size={22} color={theme.colors.textOnAccent} />
               <Text style={styles.primaryButtonText}>Sign In</Text>
             </Pressable>
             <Pressable
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 18,
     fontWeight: '600',
   },

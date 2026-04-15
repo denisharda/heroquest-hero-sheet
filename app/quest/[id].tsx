@@ -97,7 +97,7 @@ export default function QuestDetailScreen() {
             <MaterialCommunityIcons
               name={isCompleted ? 'check-circle' : 'sword-cross'}
               size={20}
-              color="#FFFFFF"
+              color={theme.colors.textOnAccent}
             />
             <Text style={styles.statusBadgeText}>
               {isCompleted ? 'COMPLETED' : 'IN PROGRESS'}
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusBadgeText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 12,
     fontWeight: '700',
     marginLeft: 6,

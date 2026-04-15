@@ -136,7 +136,7 @@ export const InventoryList: React.FC = () => {
           ]}
           onPress={() => bottomSheetRef.current?.present()}
         >
-          <Ionicons name="add" size={20} color="#FFFFFF" />
+          <Ionicons name="add" size={20} color={theme.colors.textOnAccent} />
           <Text style={styles.addButtonText}>Add Item</Text>
         </Pressable>
       </View>
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,

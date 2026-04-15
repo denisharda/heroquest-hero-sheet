@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   classIconText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 12,
     fontWeight: 'bold',
   },

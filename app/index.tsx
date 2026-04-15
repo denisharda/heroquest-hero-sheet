@@ -96,7 +96,7 @@ export default function CharacterSheet() {
               style={[styles.createButton, { backgroundColor: theme.colors.accent }]}
               onPress={() => router.push('/auth')}
             >
-              <Ionicons name="cloud-download-outline" size={24} color="#FFFFFF" />
+              <Ionicons name="cloud-download-outline" size={24} color={theme.colors.textOnAccent} />
               <Text style={styles.createButtonText}>Sign In</Text>
             </Pressable>
           )}
@@ -118,12 +118,12 @@ export default function CharacterSheet() {
             <Ionicons
               name="add"
               size={24}
-              color={isAuthenticated ? '#FFFFFF' : theme.colors.accent}
+              color={isAuthenticated ? theme.colors.textOnAccent : theme.colors.accent}
             />
             <Text
               style={[
                 styles.createButtonText,
-                { color: isAuthenticated ? '#FFFFFF' : theme.colors.accent },
+                { color: isAuthenticated ? theme.colors.textOnAccent : theme.colors.accent },
               ]}
             >
               {isAuthenticated ? 'Create Hero' : 'Continue as Guest'}
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 18,
     fontWeight: '600',
     marginLeft: 8,

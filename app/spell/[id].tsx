@@ -107,7 +107,7 @@ export default function SpellDetailScreen() {
             <MaterialCommunityIcons
               name={schoolIcon}
               size={20}
-              color="#FFFFFF"
+              color={theme.colors.textOnAccent}
             />
             <Text style={styles.schoolBadgeText}>{spell.school}</Text>
           </View>
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   schoolBadgeText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 14,
     fontWeight: '700',
     marginLeft: 6,

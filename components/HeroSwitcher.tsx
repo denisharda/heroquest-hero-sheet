@@ -296,7 +296,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
           ]}
           onPress={handleNextStep}
         >
-          <Text style={[styles.formButtonText, { color: '#FFFFFF' }]}>
+          <Text style={[styles.formButtonText, { color: theme.colors.textOnAccent }]}>
             {needsSpellSelection(selectedClass) ? 'Next' : 'Create Hero'}
           </Text>
         </Pressable>
@@ -414,7 +414,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
                 {
                   color:
                     selectedSchools.length === requiredCount
-                      ? '#FFFFFF'
+                      ? theme.colors.textOnAccent
                       : theme.colors.textSecondary,
                 },
               ]}
@@ -554,7 +554,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
               ]}
               onPress={() => setShowCreateForm(true)}
             >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
+              <Ionicons name="add" size={24} color={theme.colors.textOnAccent} />
               <Text style={styles.createButtonText}>Create New Hero</Text>
             </Pressable>
           </>
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroPortraitText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   classIconText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -723,7 +723,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spellHeaderIconText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 20,
     fontWeight: 'bold',
   },

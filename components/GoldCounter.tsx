@@ -81,7 +81,7 @@ export const GoldCounter: React.FC = () => {
           ]}
           onLongPress={handleLongPress}
         >
-          <Text style={[styles.goldValue, { color: '#FFFFFF' }]}>
+          <Text style={[styles.goldValue, { color: theme.colors.textOnAccent }]}>
             {hero.gold}
           </Text>
         </Pressable>
@@ -169,7 +169,7 @@ export const GoldCounter: React.FC = () => {
                 ]}
                 onPress={handleSave}
               >
-                <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>
+                <Text style={[styles.modalButtonText, { color: theme.colors.textOnAccent }]}>
                   Save
                 </Text>
               </Pressable>

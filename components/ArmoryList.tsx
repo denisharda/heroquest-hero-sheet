@@ -195,7 +195,7 @@ export const ArmoryList: React.FC = () => {
           style={[styles.addButton, { backgroundColor: theme.colors.accent }]}
           onPress={() => catalogSheetRef.current?.present()}
         >
-          <Ionicons name="add" size={20} color="#FFFFFF" />
+          <Ionicons name="add" size={20} color={theme.colors.textOnAccent} />
           <Text style={styles.addButtonText}>Add</Text>
         </Pressable>
       </View>
@@ -284,7 +284,7 @@ export const ArmoryList: React.FC = () => {
                     style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
                     onPress={() => handleEquip(detailItem.slot, detailItem.item)}
                   >
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Equip</Text>
+                    <Text style={[styles.actionButtonText, { color: theme.colors.textOnAccent }]}>Equip</Text>
                   </Pressable>
                 )}
 
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.textOnAccent,
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,

@@ -79,7 +79,7 @@ export const QuestProgress: React.FC = () => {
                   styles.badgeText,
                   {
                     color: isCompleted
-                      ? '#FFFFFF'
+                      ? theme.colors.textOnAccent
                       : theme.colors.textSecondary,
                   },
                 ]}
