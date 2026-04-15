@@ -49,7 +49,7 @@ export const StatBlock: React.FC = () => {
         icon={
           <MaterialCommunityIcons
             name="sword-cross"
-            size={24}
+            size={20}
             color={SHARED_COLORS.attackIcon}
           />
         }
@@ -62,7 +62,7 @@ export const StatBlock: React.FC = () => {
         icon={
           <FontAwesome5
             name="shield-alt"
-            size={22}
+            size={18}
             color={SHARED_COLORS.defendIcon}
           />
         }
@@ -73,9 +73,22 @@ export const StatBlock: React.FC = () => {
       />
       <StatBox
         icon={
+          <MaterialCommunityIcons
+            name="run-fast"
+            size={20}
+            color={SHARED_COLORS.moveIcon}
+          />
+        }
+        label="MOVE"
+        value={`${computedStats.moveDice}d6`}
+        breakdown={computedStats.moveBreakdown}
+        color={SHARED_COLORS.moveIcon}
+      />
+      <StatBox
+        icon={
           <FontAwesome5
             name="gem"
-            size={20}
+            size={16}
             color={theme.colors.mind}
           />
         }
@@ -93,31 +106,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
-    gap: 8,
+    gap: 6,
   },
   statBox: {
     flex: 1,
-    padding: 12,
+    padding: 8,
     borderRadius: 12,
     alignItems: 'center',
   },
   statHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
-    marginLeft: 4,
+    marginLeft: 3,
     letterSpacing: 0.5,
   },
   statValue: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: 'bold',
   },
   statBreakdown: {
-    fontSize: 9,
+    fontSize: 8,
     textAlign: 'center',
     marginTop: 4,
   },

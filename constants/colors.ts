@@ -35,6 +35,6 @@ export const SPELL_SCHOOL_COLORS = {
 export const ITEM_CATEGORY_COLORS = {
   potion: '#9D4EDD',
   tool: '#B8860B',
-  artifact: '#FFD700',
+  artifact: '#9B59B6',
   misc: '#708090',
 };

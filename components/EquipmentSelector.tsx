@@ -12,6 +12,7 @@ import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { WEAPONS } from '@/data/weapons';
 import { NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
+import { ITEM_CATEGORY_COLORS } from '@/constants/colors';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
 
@@ -23,6 +24,7 @@ interface EquipmentRowProps {
   value: string;
   onPress: () => void;
   twoHanded?: boolean;
+  isArtifact?: boolean;
 }
 
 const EquipmentRow: React.FC<EquipmentRowProps> = ({
@@ -31,14 +33,20 @@ const EquipmentRow: React.FC<EquipmentRowProps> = ({
   value,
   onPress,
   twoHanded,
+  isArtifact,
 }) => {
   const { theme } = useTheme();
+  const artifactColor = ITEM_CATEGORY_COLORS.artifact;
 
   return (
     <Pressable
       style={[
         styles.equipmentRow,
-        { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+        {
+          backgroundColor: isArtifact ? artifactColor + '10' : theme.colors.surface,
+          borderColor: isArtifact ? artifactColor : theme.colors.border,
+          borderWidth: isArtifact ? 1.5 : 1,
+        },
       ]}
       onPress={onPress}
     >
@@ -47,7 +55,7 @@ const EquipmentRow: React.FC<EquipmentRowProps> = ({
         <Text style={[styles.equipmentLabel, { color: theme.colors.textSecondary }]}>
           {label}
         </Text>
-        <Text style={[styles.equipmentValue, { color: theme.colors.text }]}>
+        <Text style={[styles.equipmentValue, { color: isArtifact ? artifactColor : theme.colors.text }]}>
           {value}
         </Text>
         {twoHanded && (
@@ -55,8 +63,13 @@ const EquipmentRow: React.FC<EquipmentRowProps> = ({
             Two-Handed
           </Text>
         )}
+        {isArtifact && (
+          <Text style={[styles.twoHandedBadge, { color: artifactColor }]}>
+            Artifact
+          </Text>
+        )}
       </View>
-      <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+      <Ionicons name="chevron-forward" size={20} color={isArtifact ? artifactColor : theme.colors.textSecondary} />
     </Pressable>
   );
 };
@@ -165,11 +178,12 @@ export const EquipmentSelector: React.FC = () => {
       </Text>
 
       <EquipmentRow
-        icon={<MaterialCommunityIcons name="sword" size={24} color={theme.colors.accent} />}
+        icon={<MaterialCommunityIcons name="sword" size={24} color={hero.equipment.weapon?.isArtifact ? ITEM_CATEGORY_COLORS.artifact : theme.colors.accent} />}
         label="Weapon"
         value={hero.equipment.weapon?.name ?? 'None'}
         onPress={() => openSelector('weapon')}
         twoHanded={hero.equipment.weapon?.twoHanded}
+        isArtifact={hero.equipment.weapon?.isArtifact}
       />
 
       <EquipmentRow
