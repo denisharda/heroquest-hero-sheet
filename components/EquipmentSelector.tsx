@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  Modal,
-  FlatList,
-  ScrollView,
 } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import BottomSheet, { BottomSheetFlatList, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { WEAPONS } from '@/data/weapons';
@@ -65,21 +64,33 @@ const EquipmentRow: React.FC<EquipmentRowProps> = ({
 export const EquipmentSelector: React.FC = () => {
   const { theme } = useTheme();
   const { hero, equipWeapon, equipShield, equipHelmet, equipArmor } = useHero();
-  const [modalVisible, setModalVisible] = useState(false);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedSlot, setSelectedSlot] = useState<EquipmentSlot | null>(null);
+
+  const snapPoints = useMemo(() => ['70%'], []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+    ),
+    []
+  );
 
   if (!hero) return null;
 
   const openSelector = (slot: EquipmentSlot) => {
     setSelectedSlot(slot);
-    setModalVisible(true);
+    bottomSheetRef.current?.present();
+  };
+
+  const dismiss = () => {
+    bottomSheetRef.current?.dismiss();
   };
 
   const getItemsForSlot = (): EquipmentItem[] => {
     switch (selectedSlot) {
       case 'weapon': {
         const owned = hero.ownedEquipment?.weapons ?? [];
-        // Also include artifact weapons the hero has in inventory
         const ownedIds = new Set(owned.map((w) => w.id));
         const inventoryArtifactWeaponIds = hero.inventory
           .filter((i) => i.category === 'artifact')
@@ -119,7 +130,7 @@ export const EquipmentSelector: React.FC = () => {
         equipArmor(item.id === 'none' ? null : (item as Armor));
         break;
     }
-    setModalVisible(false);
+    dismiss();
   };
 
   const getCurrentItemId = (): string => {
@@ -139,10 +150,8 @@ export const EquipmentSelector: React.FC = () => {
 
   const getStatLabel = (item: EquipmentItem): string => {
     if (selectedSlot === 'weapon') {
-      // Weapons replace attack dice, not add - so no "+" prefix
       return `${(item as Weapon).attackDice} ATK`;
     }
-    // Armor adds to base defense, so keep the "+"
     const defItem = item as Shield | Helmet | Armor;
     return defItem.defendDice > 0 ? `+${defItem.defendDice} DEF` : '';
   };
@@ -184,110 +193,82 @@ export const EquipmentSelector: React.FC = () => {
         onPress={() => openSelector('armor')}
       />
 
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        enableDynamicSizing={false}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.textSecondary }}
       >
-        <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: theme.colors.background },
-            ]}
-          >
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-                Select {selectedSlot?.charAt(0).toUpperCase()}{selectedSlot?.slice(1)}
-              </Text>
-              <Pressable onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={28} color={theme.colors.text} />
-              </Pressable>
-            </View>
-
-            <FlatList
-              data={getItemsForSlot()}
-              keyExtractor={(item) => item.id}
-              ListEmptyComponent={
-                <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
-                  No items in your armory for this slot.{'\n'}Add equipment from the Armory section below.
-                </Text>
-              }
-              renderItem={({ item }) => {
-                const isSelected = item.id === getCurrentItemId();
-                const statLabel = getStatLabel(item);
-
-                return (
-                  <Pressable
-                    style={[
-                      styles.itemOption,
-                      {
-                        backgroundColor: isSelected
-                          ? theme.colors.accent + '30'
-                          : theme.colors.surface,
-                        borderColor: theme.colors.border,
-                      },
-                    ]}
-                    onPress={() => handleSelect(item)}
-                  >
-                    <View style={styles.itemInfo}>
-                      <Text
-                        style={[
-                          styles.itemName,
-                          { color: theme.colors.text },
-                        ]}
-                      >
-                        {item.name}
-                      </Text>
-                      {item.description && (
-                        <Text
-                          style={[
-                            styles.itemDescription,
-                            { color: theme.colors.textSecondary },
-                          ]}
-                          numberOfLines={2}
-                        >
-                          {item.description}
-                        </Text>
-                      )}
-                    </View>
-                    <View style={styles.itemStats}>
-                      {statLabel ? (
-                        <Text
-                          style={[
-                            styles.itemStatValue,
-                            { color: theme.colors.accent },
-                          ]}
-                        >
-                          {statLabel}
-                        </Text>
-                      ) : null}
-                      {item.goldCost > 0 && (
-                        <Text
-                          style={[
-                            styles.itemGold,
-                            { color: theme.colors.gold },
-                          ]}
-                        >
-                          {item.goldCost}g
-                        </Text>
-                      )}
-                    </View>
-                    {isSelected && (
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={24}
-                        color={theme.colors.accent}
-                      />
-                    )}
-                  </Pressable>
-                );
-              }}
-            />
-          </View>
+        <View style={styles.modalHeader}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Select {selectedSlot?.charAt(0).toUpperCase()}{selectedSlot?.slice(1)}
+          </Text>
+          <Pressable onPress={dismiss}>
+            <Ionicons name="close" size={28} color={theme.colors.text} />
+          </Pressable>
         </View>
-      </Modal>
+
+        <BottomSheetFlatList
+          data={getItemsForSlot()}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
+              No items in your armory for this slot.{'\n'}Add equipment from the Armory section below.
+            </Text>
+          }
+          renderItem={({ item }) => {
+            const isSelected = item.id === getCurrentItemId();
+            const statLabel = getStatLabel(item);
+
+            return (
+              <Pressable
+                style={[
+                  styles.itemOption,
+                  {
+                    backgroundColor: isSelected
+                      ? theme.colors.accent + '30'
+                      : theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => handleSelect(item)}
+              >
+                <View style={styles.itemInfo}>
+                  <Text style={[styles.itemName, { color: theme.colors.text }]}>
+                    {item.name}
+                  </Text>
+                  {item.description && (
+                    <Text
+                      style={[styles.itemDescription, { color: theme.colors.textSecondary }]}
+                      numberOfLines={2}
+                    >
+                      {item.description}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.itemStats}>
+                  {statLabel ? (
+                    <Text style={[styles.itemStatValue, { color: theme.colors.accent }]}>
+                      {statLabel}
+                    </Text>
+                  ) : null}
+                  {item.goldCost > 0 && (
+                    <Text style={[styles.itemGold, { color: theme.colors.gold }]}>
+                      {item.goldCost}g
+                    </Text>
+                  )}
+                </View>
+                {isSelected && (
+                  <Ionicons name="checkmark-circle" size={24} color={theme.colors.accent} />
+                )}
+              </Pressable>
+            );
+          }}
+        />
+      </BottomSheetModal>
     </View>
   );
 };
@@ -332,27 +313,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 2,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    maxHeight: '70%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 16,
-  },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 20,
   },
   modalTitle: {
     fontSize: 20,
     fontFamily: 'Cinzel_700Bold',
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   itemOption: {
     flexDirection: 'row',

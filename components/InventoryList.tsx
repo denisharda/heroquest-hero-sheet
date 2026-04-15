@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  Modal,
-  FlatList,
-  SectionList,
 } from 'react-native';
+import { BottomSheetModal, BottomSheetBackdrop, BottomSheetSectionList } from '@gorhom/bottom-sheet';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeContext';
@@ -83,8 +81,17 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
 export const InventoryList: React.FC = () => {
   const { theme } = useTheme();
   const { hero, addItem } = useHero();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const router = useRouter();
+
+  const snapPoints = useMemo(() => ['70%'], []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+    ),
+    []
+  );
 
   if (!hero) return null;
 
@@ -94,7 +101,7 @@ export const InventoryList: React.FC = () => {
     if (newItem) {
       addItem(newItem);
     }
-    setShowAddModal(false);
+    bottomSheetRef.current?.dismiss();
   };
 
   const handleItemPress = (itemId: string) => {
@@ -118,7 +125,7 @@ export const InventoryList: React.FC = () => {
             styles.addButton,
             { backgroundColor: theme.colors.accent },
           ]}
-          onPress={() => setShowAddModal(true)}
+          onPress={() => bottomSheetRef.current?.present()}
         >
           <Ionicons name="add" size={20} color="#FFFFFF" />
           <Text style={styles.addButtonText}>Add Item</Text>
@@ -153,89 +160,83 @@ export const InventoryList: React.FC = () => {
         ))
       )}
 
-      <Modal
-        visible={showAddModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowAddModal(false)}
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        enableDynamicSizing={false}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.textSecondary }}
       >
-        <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: theme.colors.background },
-            ]}
-          >
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-                Add Item
-              </Text>
-              <Pressable onPress={() => setShowAddModal(false)}>
-                <Ionicons name="close" size={28} color={theme.colors.text} />
-              </Pressable>
-            </View>
-
-            <SectionList
-              sections={groupedItems}
-              keyExtractor={(item) => item.id}
-              renderSectionHeader={({ section }) => (
-                <Text
-                  style={[
-                    styles.sectionHeader,
-                    {
-                      backgroundColor: theme.colors.surfaceVariant,
-                      color: theme.colors.text,
-                    },
-                  ]}
-                >
-                  {section.title}
-                </Text>
-              )}
-              renderItem={({ item }) => {
-                const alreadyHas = hero.inventory.some((i) => i.id === item.id);
-                return (
-                  <Pressable
-                    style={[
-                      styles.addItemOption,
-                      {
-                        backgroundColor: theme.colors.surface,
-                        borderColor: theme.colors.border,
-                      },
-                    ]}
-                    onPress={() => handleAddItem(item.id)}
-                  >
-                    <View style={styles.addItemInfo}>
-                      <Text
-                        style={[
-                          styles.addItemName,
-                          { color: theme.colors.text },
-                        ]}
-                      >
-                        {item.name}
-                        {alreadyHas && ' (owned)'}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.addItemDesc,
-                          { color: theme.colors.textSecondary },
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {item.description}
-                      </Text>
-                    </View>
-                    <Text
-                      style={[styles.addItemGold, { color: theme.colors.gold }]}
-                    >
-                      {item.goldCost}g
-                    </Text>
-                  </Pressable>
-                );
-              }}
-            />
-          </View>
+        <View style={styles.modalHeader}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Add Item
+          </Text>
+          <Pressable onPress={() => bottomSheetRef.current?.dismiss()}>
+            <Ionicons name="close" size={28} color={theme.colors.text} />
+          </Pressable>
         </View>
-      </Modal>
+
+        <BottomSheetSectionList
+          sections={groupedItems}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+          renderSectionHeader={({ section }) => (
+            <Text
+              style={[
+                styles.sectionHeader,
+                {
+                  backgroundColor: theme.colors.surfaceVariant,
+                  color: theme.colors.text,
+                },
+              ]}
+            >
+              {section.title}
+            </Text>
+          )}
+          renderItem={({ item }) => {
+            const alreadyHas = hero.inventory.some((i) => i.id === item.id);
+            return (
+              <Pressable
+                style={[
+                  styles.addItemOption,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => handleAddItem(item.id)}
+              >
+                <View style={styles.addItemInfo}>
+                  <Text
+                    style={[
+                      styles.addItemName,
+                      { color: theme.colors.text },
+                    ]}
+                  >
+                    {item.name}
+                    {alreadyHas && ' (owned)'}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.addItemDesc,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {item.description}
+                  </Text>
+                </View>
+                <Text
+                  style={[styles.addItemGold, { color: theme.colors.gold }]}
+                >
+                  {item.goldCost}g
+                </Text>
+              </Pressable>
+            );
+          }}
+        />
+      </BottomSheetModal>
     </View>
   );
 };
@@ -303,23 +304,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: 8,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    maxHeight: '70%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 16,
-  },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 20,
   },
   modalTitle: {
     fontSize: 20,

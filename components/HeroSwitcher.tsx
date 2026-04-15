@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  Modal,
-  FlatList,
   TextInput,
   Alert,
-  ScrollView,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHeroList } from '@/hooks/useHero';
 import { HERO_CLASSES, HERO_CLASS_NAMES } from '@/data/heroes';
@@ -52,6 +50,22 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
   const [newHeroName, setNewHeroName] = useState('');
   const [selectedClass, setSelectedClass] = useState<HeroClassName>('Barbarian');
   const [selectedSchools, setSelectedSchools] = useState<SpellSchool[]>([]);
+
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['85%'], []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+    ),
+    []
+  );
+
+  // Present/dismiss based on visible prop
+  useEffect(() => {
+    if (visible) bottomSheetRef.current?.present();
+    else bottomSheetRef.current?.dismiss();
+  }, [visible]);
 
   // Reset form when closing
   useEffect(() => {
@@ -283,7 +297,7 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
     const classData = HERO_CLASSES[selectedClass];
 
     return (
-      <ScrollView style={styles.createForm}>
+      <BottomSheetScrollView style={styles.createForm}>
         <View style={styles.spellHeader}>
           <View
             style={[
@@ -397,170 +411,154 @@ export const HeroSwitcher: React.FC<HeroSwitcherProps> = ({
             </Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </BottomSheetScrollView>
     );
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      snapPoints={snapPoints}
+      backdropComponent={renderBackdrop}
+      enableDynamicSizing={false}
+      onDismiss={onClose}
+      backgroundStyle={{ backgroundColor: theme.colors.background }}
+      handleIndicatorStyle={{ backgroundColor: theme.colors.textSecondary }}
     >
-      <View style={styles.modalOverlay}>
-        <View
-          style={[
-            styles.modalContent,
-            { backgroundColor: theme.colors.background },
-          ]}
-        >
-          <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-              {showCreateForm
-                ? creationStep === 'spells'
-                  ? 'Choose Spell Schools'
-                  : 'Create New Hero'
-                : 'Your Heroes'}
-            </Text>
-            <Pressable onPress={onClose}>
-              <Ionicons name="close" size={28} color={theme.colors.text} />
-            </Pressable>
-          </View>
+      <View style={{ flex: 1, padding: 16 }}>
+        <View style={styles.modalHeader}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            {showCreateForm
+              ? creationStep === 'spells'
+                ? 'Choose Spell Schools'
+                : 'Create New Hero'
+              : 'Your Heroes'}
+          </Text>
+          <Pressable onPress={onClose}>
+            <Ionicons name="close" size={28} color={theme.colors.text} />
+          </Pressable>
+        </View>
 
-          {showCreateForm ? (
-            creationStep === 'spells' ? (
-              renderSpellSelection()
-            ) : (
-              renderClassSelection()
-            )
+        {showCreateForm ? (
+          creationStep === 'spells' ? (
+            renderSpellSelection()
           ) : (
-            <>
-              {heroes.length === 0 ? (
-                <View style={styles.emptyState}>
-                  <MaterialCommunityIcons
-                    name="sword-cross"
-                    size={60}
-                    color={theme.colors.textSecondary}
-                  />
-                  <Text
-                    style={[styles.emptyText, { color: theme.colors.textSecondary }]}
-                  >
-                    No heroes yet
-                  </Text>
-                  <Text
-                    style={[styles.emptySubtext, { color: theme.colors.textSecondary }]}
-                  >
-                    Create your first hero to begin your quest!
-                  </Text>
-                </View>
-              ) : (
-                <FlatList
-                  data={heroes}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => {
-                    const classData = HERO_CLASSES[item.heroClass];
-                    const isSelected = item.id === currentHeroId;
-                    return (
-                      <Pressable
+            renderClassSelection()
+          )
+        ) : (
+          <>
+            {heroes.length === 0 ? (
+              <View style={styles.emptyState}>
+                <MaterialCommunityIcons
+                  name="sword-cross"
+                  size={60}
+                  color={theme.colors.textSecondary}
+                />
+                <Text
+                  style={[styles.emptyText, { color: theme.colors.textSecondary }]}
+                >
+                  No heroes yet
+                </Text>
+                <Text
+                  style={[styles.emptySubtext, { color: theme.colors.textSecondary }]}
+                >
+                  Create your first hero to begin your quest!
+                </Text>
+              </View>
+            ) : (
+              <BottomSheetFlatList
+                data={heroes}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  const classData = HERO_CLASSES[item.heroClass];
+                  const isSelected = item.id === currentHeroId;
+                  return (
+                    <Pressable
+                      style={[
+                        styles.heroItem,
+                        {
+                          backgroundColor: isSelected
+                            ? theme.colors.accent + '20'
+                            : theme.colors.surface,
+                          borderColor: isSelected
+                            ? theme.colors.accent
+                            : theme.colors.border,
+                        },
+                      ]}
+                      onPress={() => handleSelectHero(item.id)}
+                    >
+                      <View
                         style={[
-                          styles.heroItem,
-                          {
-                            backgroundColor: isSelected
-                              ? theme.colors.accent + '20'
-                              : theme.colors.surface,
-                            borderColor: isSelected
-                              ? theme.colors.accent
-                              : theme.colors.border,
-                          },
+                          styles.heroPortrait,
+                          { backgroundColor: classData.portraitColor },
                         ]}
-                        onPress={() => handleSelectHero(item.id)}
                       >
-                        <View
+                        <Text style={styles.heroPortraitText}>
+                          {classData.portraitInitial}
+                        </Text>
+                      </View>
+                      <View style={styles.heroInfo}>
+                        <Text
+                          style={[styles.heroName, { color: theme.colors.text }]}
+                        >
+                          {item.name || 'Unnamed Hero'}
+                        </Text>
+                        <Text
                           style={[
-                            styles.heroPortrait,
-                            { backgroundColor: classData.portraitColor },
+                            styles.heroClass,
+                            { color: theme.colors.textSecondary },
                           ]}
                         >
-                          <Text style={styles.heroPortraitText}>
-                            {classData.portraitInitial}
-                          </Text>
-                        </View>
-                        <View style={styles.heroInfo}>
-                          <Text
-                            style={[styles.heroName, { color: theme.colors.text }]}
-                          >
-                            {item.name || 'Unnamed Hero'}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.heroClass,
-                              { color: theme.colors.textSecondary },
-                            ]}
-                          >
-                            {item.heroClass} • {item.questsCompleted.length}/14 Quests
-                          </Text>
-                        </View>
-                        {isSelected && (
-                          <Ionicons
-                            name="checkmark-circle"
-                            size={24}
-                            color={theme.colors.accent}
-                          />
-                        )}
-                        <Pressable
-                          style={styles.deleteButton}
-                          onPress={() => handleDeleteHero(item.id, item.name)}
-                        >
-                          <Ionicons
-                            name="trash-outline"
-                            size={20}
-                            color={theme.colors.danger}
-                          />
-                        </Pressable>
+                          {item.heroClass} • {item.questsCompleted.length}/14 Quests
+                        </Text>
+                      </View>
+                      {isSelected && (
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={24}
+                          color={theme.colors.accent}
+                        />
+                      )}
+                      <Pressable
+                        style={styles.deleteButton}
+                        onPress={() => handleDeleteHero(item.id, item.name)}
+                      >
+                        <Ionicons
+                          name="trash-outline"
+                          size={20}
+                          color={theme.colors.danger}
+                        />
                       </Pressable>
-                    );
-                  }}
-                />
-              )}
+                    </Pressable>
+                  );
+                }}
+              />
+            )}
 
-              <Pressable
-                style={[
-                  styles.createButton,
-                  { backgroundColor: theme.colors.accent },
-                ]}
-                onPress={() => setShowCreateForm(true)}
-              >
-                <Ionicons name="add" size={24} color="#FFFFFF" />
-                <Text style={styles.createButtonText}>Create New Hero</Text>
-              </Pressable>
-            </>
-          )}
-        </View>
+            <Pressable
+              style={[
+                styles.createButton,
+                { backgroundColor: theme.colors.accent },
+              ]}
+              onPress={() => setShowCreateForm(true)}
+            >
+              <Ionicons name="add" size={24} color="#FFFFFF" />
+              <Text style={styles.createButtonText}>Create New Hero</Text>
+            </Pressable>
+          </>
+        )}
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-start',
-    paddingTop: 80,
-  },
-  modalContent: {
-    maxHeight: '85%',
-    borderRadius: 20,
-    marginHorizontal: 16,
-    padding: 16,
-  },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 20,
   },
   modalTitle: {
     fontSize: 20,

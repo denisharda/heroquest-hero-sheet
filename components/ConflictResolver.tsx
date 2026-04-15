@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Modal,
   Pressable,
-  ScrollView,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { Hero, HeroConflict } from '@/types';
 import { HERO_CLASSES } from '@/data/heroes';
@@ -26,10 +25,20 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
 }) => {
   const { theme } = useTheme();
   const [choices, setChoices] = useState<Map<string, 'local' | 'remote'>>(new Map());
-  // Two-phase close: showModal controls the Modal visible prop,
+  // Two-phase close: showModal controls the BottomSheetModal present/dismiss,
   // pendingResolve holds the choices until the animation finishes.
   const [showModal, setShowModal] = useState(false);
   const pendingResolve = useRef<Map<string, 'local' | 'remote'> | null>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const snapPoints = useMemo(() => ['70%'], []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+    ),
+    []
+  );
 
   const hasConflicts = conflicts.length > 0;
 
@@ -43,6 +52,15 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
       setShowModal(false);
     }
   }, [hasConflicts]);
+
+  // Present/dismiss BottomSheetModal based on showModal state
+  useEffect(() => {
+    if (showModal) {
+      bottomSheetRef.current?.present();
+    } else {
+      bottomSheetRef.current?.dismiss();
+    }
+  }, [showModal]);
 
   const handleApply = useCallback(() => {
     // Store choices, then start the close animation
@@ -61,26 +79,20 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
   }, [choices, onResolve]);
 
   const handleDismiss = useCallback(() => {
-    // Called after the Modal slide-out animation completes (iOS)
+    // Called after the BottomSheetModal dismiss animation completes
     if (pendingResolve.current) {
       onResolve(pendingResolve.current);
       pendingResolve.current = null;
+    } else {
+      // No pending resolve means this was a cancel/backdrop tap
+      onCancel?.();
     }
-  }, [onResolve]);
+  }, [onResolve, onCancel]);
 
   const handleCancel = useCallback(() => {
+    pendingResolve.current = null;
     setShowModal(false);
-    // Delay cancel callback for animation to finish
-    if (Platform.OS === 'android') {
-      setTimeout(() => onCancel?.(), 400);
-    } else {
-      // Will be called via onDismiss if no pending resolve
-      pendingResolve.current = null;
-      // onDismiss won't call onResolve since pendingResolve is null,
-      // so we need a separate mechanism for cancel
-      setTimeout(() => onCancel?.(), 400);
-    }
-  }, [onCancel]);
+  }, []);
 
   const setChoice = (heroId: string, choice: 'local' | 'remote') => {
     setChoices((prev) => {
@@ -113,189 +125,183 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
   };
 
   return (
-    <Modal
-      visible={showModal}
-      transparent
-      animationType="slide"
-      onRequestClose={handleCancel}
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      snapPoints={snapPoints}
+      backdropComponent={renderBackdrop}
+      enableDynamicSizing={false}
       onDismiss={handleDismiss}
+      backgroundStyle={{ backgroundColor: theme.colors.background }}
+      handleIndicatorStyle={{ backgroundColor: theme.colors.textSecondary }}
     >
-      <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
-        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-          <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-              Sync Conflict
-            </Text>
-            <Pressable onPress={handleCancel}>
-              <Ionicons name="close" size={28} color={theme.colors.text} />
-            </Pressable>
-          </View>
-          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-            {hasDeletionConflicts && !hasEditConflicts
-              ? conflicts.length === 1
-                ? 'This hero was deleted on this device but still exists in the cloud. What would you like to do?'
-                : `${conflicts.length} heroes were deleted on this device but still exist in the cloud. Choose what to do with each.`
-              : hasEditConflicts && !hasDeletionConflicts
-                ? conflicts.length === 1
-                  ? 'This hero has been changed both locally and in the cloud. Which version do you want to keep?'
-                  : `${conflicts.length} heroes have been changed both locally and in the cloud. Choose which version to keep for each.`
-                : 'Some heroes need your attention before syncing. Choose what to do with each.'}
+      <View style={styles.container}>
+        <View style={styles.modalHeader}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Sync Conflict
           </Text>
-
-          <ScrollView style={styles.scrollView}>
-            {conflicts.map((conflict) => {
-              const selected = choices.get(conflict.heroId);
-              const isDeletion = conflict.local === null;
-
-              return (
-                <View
-                  key={conflict.heroId}
-                  style={[styles.conflictCard, { backgroundColor: theme.colors.surface }]}
-                >
-                  <Text style={[styles.heroName, { color: theme.colors.text }]}>
-                    {conflict.heroName}
-                  </Text>
-
-                  {isDeletion ? (
-                    <>
-                      <Pressable
-                        style={[
-                          styles.versionCard,
-                          {
-                            borderColor: selected === 'remote' ? theme.colors.accent : theme.colors.border,
-                            borderWidth: selected === 'remote' ? 2 : 1,
-                            backgroundColor: selected === 'remote' ? theme.colors.accent + '10' : 'transparent',
-                          },
-                        ]}
-                        onPress={() => setChoice(conflict.heroId, 'remote')}
-                      >
-                        <View style={styles.versionHeader}>
-                          <Ionicons name="cloud-download" size={16} color={theme.colors.success} />
-                          <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
-                            Restore from Cloud
-                          </Text>
-                        </View>
-                        {summarizeHero(conflict.remote).map((line, i) => (
-                          <Text key={i} style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
-                            {line}
-                          </Text>
-                        ))}
-                      </Pressable>
-
-                      <Pressable
-                        style={[
-                          styles.versionCard,
-                          {
-                            borderColor: selected === 'local' ? theme.colors.danger : theme.colors.border,
-                            borderWidth: selected === 'local' ? 2 : 1,
-                            backgroundColor: selected === 'local' ? theme.colors.danger + '10' : 'transparent',
-                          },
-                        ]}
-                        onPress={() => setChoice(conflict.heroId, 'local')}
-                      >
-                        <View style={styles.versionHeader}>
-                          <Ionicons name="trash" size={16} color={theme.colors.danger} />
-                          <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
-                            Delete Permanently
-                          </Text>
-                        </View>
-                        <Text style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
-                          Remove this hero from the cloud as well
-                        </Text>
-                      </Pressable>
-                    </>
-                  ) : (
-                    <>
-                      <Pressable
-                        style={[
-                          styles.versionCard,
-                          {
-                            borderColor: selected === 'local' ? theme.colors.accent : theme.colors.border,
-                            borderWidth: selected === 'local' ? 2 : 1,
-                            backgroundColor: selected === 'local' ? theme.colors.accent + '10' : 'transparent',
-                          },
-                        ]}
-                        onPress={() => setChoice(conflict.heroId, 'local')}
-                      >
-                        <View style={styles.versionHeader}>
-                          <Ionicons name="phone-portrait" size={16} color={theme.colors.text} />
-                          <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
-                            This Device
-                          </Text>
-                          <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>
-                            {formatDate(conflict.local!.updatedAt)}
-                          </Text>
-                        </View>
-                        {summarizeHero(conflict.local!).map((line, i) => (
-                          <Text key={i} style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
-                            {line}
-                          </Text>
-                        ))}
-                      </Pressable>
-
-                      <Pressable
-                        style={[
-                          styles.versionCard,
-                          {
-                            borderColor: selected === 'remote' ? theme.colors.accent : theme.colors.border,
-                            borderWidth: selected === 'remote' ? 2 : 1,
-                            backgroundColor: selected === 'remote' ? theme.colors.accent + '10' : 'transparent',
-                          },
-                        ]}
-                        onPress={() => setChoice(conflict.heroId, 'remote')}
-                      >
-                        <View style={styles.versionHeader}>
-                          <Ionicons name="cloud" size={16} color={theme.colors.text} />
-                          <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
-                            Cloud
-                          </Text>
-                          <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>
-                            {formatDate(conflict.remote.updatedAt)}
-                          </Text>
-                        </View>
-                        {summarizeHero(conflict.remote).map((line, i) => (
-                          <Text key={i} style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
-                            {line}
-                          </Text>
-                        ))}
-                      </Pressable>
-                    </>
-                  )}
-                </View>
-              );
-            })}
-          </ScrollView>
-
-          <Pressable
-            style={[
-              styles.resolveButton,
-              {
-                backgroundColor: allResolved ? theme.colors.accent : theme.colors.surfaceVariant,
-                opacity: allResolved ? 1 : 0.5,
-              },
-            ]}
-            onPress={handleApply}
-            disabled={!allResolved}
-          >
-            <Text style={styles.resolveButtonText}>
-              {allResolved ? 'Apply Choices' : 'Select a version for each hero'}
-            </Text>
+          <Pressable onPress={handleCancel}>
+            <Ionicons name="close" size={28} color={theme.colors.text} />
           </Pressable>
         </View>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          {hasDeletionConflicts && !hasEditConflicts
+            ? conflicts.length === 1
+              ? 'This hero was deleted on this device but still exists in the cloud. What would you like to do?'
+              : `${conflicts.length} heroes were deleted on this device but still exist in the cloud. Choose what to do with each.`
+            : hasEditConflicts && !hasDeletionConflicts
+              ? conflicts.length === 1
+                ? 'This hero has been changed both locally and in the cloud. Which version do you want to keep?'
+                : `${conflicts.length} heroes have been changed both locally and in the cloud. Choose which version to keep for each.`
+              : 'Some heroes need your attention before syncing. Choose what to do with each.'}
+        </Text>
+
+        <BottomSheetScrollView style={styles.scrollView}>
+          {conflicts.map((conflict) => {
+            const selected = choices.get(conflict.heroId);
+            const isDeletion = conflict.local === null;
+
+            return (
+              <View
+                key={conflict.heroId}
+                style={[styles.conflictCard, { backgroundColor: theme.colors.surface }]}
+              >
+                <Text style={[styles.heroName, { color: theme.colors.text }]}>
+                  {conflict.heroName}
+                </Text>
+
+                {isDeletion ? (
+                  <>
+                    <Pressable
+                      style={[
+                        styles.versionCard,
+                        {
+                          borderColor: selected === 'remote' ? theme.colors.accent : theme.colors.border,
+                          borderWidth: selected === 'remote' ? 2 : 1,
+                          backgroundColor: selected === 'remote' ? theme.colors.accent + '10' : 'transparent',
+                        },
+                      ]}
+                      onPress={() => setChoice(conflict.heroId, 'remote')}
+                    >
+                      <View style={styles.versionHeader}>
+                        <Ionicons name="cloud-download" size={16} color={theme.colors.success} />
+                        <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
+                          Restore from Cloud
+                        </Text>
+                      </View>
+                      {summarizeHero(conflict.remote).map((line, i) => (
+                        <Text key={i} style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
+                          {line}
+                        </Text>
+                      ))}
+                    </Pressable>
+
+                    <Pressable
+                      style={[
+                        styles.versionCard,
+                        {
+                          borderColor: selected === 'local' ? theme.colors.danger : theme.colors.border,
+                          borderWidth: selected === 'local' ? 2 : 1,
+                          backgroundColor: selected === 'local' ? theme.colors.danger + '10' : 'transparent',
+                        },
+                      ]}
+                      onPress={() => setChoice(conflict.heroId, 'local')}
+                    >
+                      <View style={styles.versionHeader}>
+                        <Ionicons name="trash" size={16} color={theme.colors.danger} />
+                        <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
+                          Delete Permanently
+                        </Text>
+                      </View>
+                      <Text style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
+                        Remove this hero from the cloud as well
+                      </Text>
+                    </Pressable>
+                  </>
+                ) : (
+                  <>
+                    <Pressable
+                      style={[
+                        styles.versionCard,
+                        {
+                          borderColor: selected === 'local' ? theme.colors.accent : theme.colors.border,
+                          borderWidth: selected === 'local' ? 2 : 1,
+                          backgroundColor: selected === 'local' ? theme.colors.accent + '10' : 'transparent',
+                        },
+                      ]}
+                      onPress={() => setChoice(conflict.heroId, 'local')}
+                    >
+                      <View style={styles.versionHeader}>
+                        <Ionicons name="phone-portrait" size={16} color={theme.colors.text} />
+                        <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
+                          This Device
+                        </Text>
+                        <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>
+                          {formatDate(conflict.local!.updatedAt)}
+                        </Text>
+                      </View>
+                      {summarizeHero(conflict.local!).map((line, i) => (
+                        <Text key={i} style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
+                          {line}
+                        </Text>
+                      ))}
+                    </Pressable>
+
+                    <Pressable
+                      style={[
+                        styles.versionCard,
+                        {
+                          borderColor: selected === 'remote' ? theme.colors.accent : theme.colors.border,
+                          borderWidth: selected === 'remote' ? 2 : 1,
+                          backgroundColor: selected === 'remote' ? theme.colors.accent + '10' : 'transparent',
+                        },
+                      ]}
+                      onPress={() => setChoice(conflict.heroId, 'remote')}
+                    >
+                      <View style={styles.versionHeader}>
+                        <Ionicons name="cloud" size={16} color={theme.colors.text} />
+                        <Text style={[styles.versionLabel, { color: theme.colors.text }]}>
+                          Cloud
+                        </Text>
+                        <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>
+                          {formatDate(conflict.remote.updatedAt)}
+                        </Text>
+                      </View>
+                      {summarizeHero(conflict.remote).map((line, i) => (
+                        <Text key={i} style={[styles.versionDetail, { color: theme.colors.textSecondary }]}>
+                          {line}
+                        </Text>
+                      ))}
+                    </Pressable>
+                  </>
+                )}
+              </View>
+            );
+          })}
+        </BottomSheetScrollView>
+
+        <Pressable
+          style={[
+            styles.resolveButton,
+            {
+              backgroundColor: allResolved ? theme.colors.accent : theme.colors.surfaceVariant,
+              opacity: allResolved ? 1 : 0.5,
+            },
+          ]}
+          onPress={handleApply}
+          disabled={!allResolved}
+        >
+          <Text style={styles.resolveButtonText}>
+            {allResolved ? 'Apply Choices' : 'Select a version for each hero'}
+          </Text>
+        </Pressable>
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
   container: {
-    maxHeight: '90%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    flex: 1,
     padding: 20,
     paddingBottom: 40,
   },
@@ -304,6 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    paddingHorizontal: 20,
   },
   modalTitle: {
     fontSize: 20,

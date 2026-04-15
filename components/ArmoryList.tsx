@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  Modal,
-  SectionList,
   Alert,
 } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal, BottomSheetBackdrop, BottomSheetSectionList, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { getAvailableWeapons, WEAPONS } from '@/data/weapons';
@@ -72,8 +71,18 @@ export const ArmoryList: React.FC = () => {
     addOwnedWeapon, addOwnedShield, addOwnedHelmet, addOwnedArmor,
     removeOwnedWeapon, removeOwnedShield, removeOwnedHelmet, removeOwnedArmor,
   } = useHero();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const detailSheetRef = useRef<BottomSheetModal>(null);
+  const catalogSheetRef = useRef<BottomSheetModal>(null);
   const [detailItem, setDetailItem] = useState<{ item: AnyEquipment; slot: EquipmentSlot } | null>(null);
+
+  const catalogSnapPoints = useMemo(() => ['70%'], []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+    ),
+    []
+  );
 
   if (!hero) return null;
 
@@ -105,6 +114,11 @@ export const ArmoryList: React.FC = () => {
     }
   };
 
+  const openDetail = (item: AnyEquipment, slot: EquipmentSlot) => {
+    setDetailItem({ item, slot });
+    detailSheetRef.current?.present();
+  };
+
   const handleAdd = async (slot: EquipmentSlot, item: AnyEquipment) => {
     if (isOwned(slot, item.id)) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -114,7 +128,7 @@ export const ArmoryList: React.FC = () => {
       case 'helmet': addOwnedHelmet(item as Helmet); break;
       case 'armor': addOwnedArmor(item as Armor); break;
     }
-    setShowAddModal(false);
+    catalogSheetRef.current?.dismiss();
   };
 
   const handleEquip = async (slot: EquipmentSlot, item: AnyEquipment) => {
@@ -125,18 +139,18 @@ export const ArmoryList: React.FC = () => {
       case 'helmet': equipHelmet(item as Helmet); break;
       case 'armor': equipArmor(item as Armor); break;
     }
-    setDetailItem(null);
+    detailSheetRef.current?.dismiss();
   };
 
   const handleUnequip = async (slot: EquipmentSlot) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     switch (slot) {
-      case 'weapon': break; // Can't unequip weapon (always have one)
+      case 'weapon': break;
       case 'shield': equipShield(null); break;
       case 'helmet': equipHelmet(null); break;
       case 'armor': equipArmor(null); break;
     }
-    setDetailItem(null);
+    detailSheetRef.current?.dismiss();
   };
 
   const handleDiscard = async (slot: EquipmentSlot, itemId: string) => {
@@ -151,12 +165,11 @@ export const ArmoryList: React.FC = () => {
       case 'helmet': removeOwnedHelmet(itemId); break;
       case 'armor': removeOwnedArmor(itemId); break;
     }
-    setDetailItem(null);
+    detailSheetRef.current?.dismiss();
   };
 
   type EquipSection = { title: string; slot: EquipmentSlot; data: AnyEquipment[] };
 
-  // Build sections for owned items
   const allOwnedSections: EquipSection[] = [
     { title: 'Weapons', slot: 'weapon' as EquipmentSlot, data: owned.weapons },
     { title: 'Shields', slot: 'shield' as EquipmentSlot, data: owned.shields },
@@ -167,7 +180,6 @@ export const ArmoryList: React.FC = () => {
 
   const totalOwnedCount = owned.weapons.length + owned.shields.length + owned.helmets.length + owned.armor.length;
 
-  // Build sections for add modal (full catalog)
   const catalogSections: EquipSection[] = [
     { title: 'Weapons', slot: 'weapon' as EquipmentSlot, data: getAvailableWeapons(hero.heroClass) },
     { title: 'Shields', slot: 'shield' as EquipmentSlot, data: getAvailableShields(hero.heroClass) },
@@ -181,7 +193,7 @@ export const ArmoryList: React.FC = () => {
         <Text style={[styles.title, { color: theme.colors.text }]}>ARMORY</Text>
         <Pressable
           style={[styles.addButton, { backgroundColor: theme.colors.accent }]}
-          onPress={() => setShowAddModal(true)}
+          onPress={() => catalogSheetRef.current?.present()}
         >
           <Ionicons name="add" size={20} color="#FFFFFF" />
           <Text style={styles.addButtonText}>Add</Text>
@@ -208,188 +220,186 @@ export const ArmoryList: React.FC = () => {
                 slot={section.slot}
                 isEquipped={isEquipped(section.slot, item.id)}
                 statLabel={getStatLabel(section.slot, item)}
-                onPress={() => setDetailItem({ item, slot: section.slot })}
+                onPress={() => openDetail(item, section.slot)}
               />
             ))}
           </View>
         ))
       )}
 
-      {/* Detail Modal */}
-      <Modal
-        visible={!!detailItem}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setDetailItem(null)}
+      {/* Detail Sheet */}
+      <BottomSheetModal
+        ref={detailSheetRef}
+        enableDynamicSizing
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.textSecondary }}
       >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-            {detailItem && (
-              <>
-                <View style={styles.modalHeader}>
-                  <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-                    {detailItem.item.name}
-                  </Text>
-                  <Pressable onPress={() => setDetailItem(null)}>
-                    <Ionicons name="close" size={28} color={theme.colors.text} />
-                  </Pressable>
-                </View>
+        <BottomSheetScrollView style={styles.sheetContent}>
+          {detailItem && (
+            <>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                  {detailItem.item.name}
+                </Text>
+                <Pressable onPress={() => detailSheetRef.current?.dismiss()}>
+                  <Ionicons name="close" size={28} color={theme.colors.text} />
+                </Pressable>
+              </View>
 
-                <View style={[styles.detailBadgeRow]}>
-                  <View style={[styles.typeBadge, { backgroundColor: theme.colors.accent + '30' }]}>
-                    <Text style={[styles.typeBadgeText, { color: theme.colors.accent }]}>
-                      {detailItem.slot.charAt(0).toUpperCase() + detailItem.slot.slice(1)}
-                    </Text>
-                  </View>
-                  <Text style={[styles.detailStat, { color: theme.colors.accent }]}>
-                    {getStatLabel(detailItem.slot, detailItem.item)}
+              <View style={styles.detailBadgeRow}>
+                <View style={[styles.typeBadge, { backgroundColor: theme.colors.accent + '30' }]}>
+                  <Text style={[styles.typeBadgeText, { color: theme.colors.accent }]}>
+                    {detailItem.slot.charAt(0).toUpperCase() + detailItem.slot.slice(1)}
                   </Text>
-                  {detailItem.item.goldCost > 0 && (
-                    <Text style={[styles.detailGold, { color: theme.colors.gold }]}>
-                      {detailItem.item.goldCost}g
-                    </Text>
-                  )}
                 </View>
-
-                {detailItem.item.description && (
-                  <Text style={[styles.detailDesc, { color: theme.colors.textSecondary }]}>
-                    {detailItem.item.description}
+                <Text style={[styles.detailStat, { color: theme.colors.accent }]}>
+                  {getStatLabel(detailItem.slot, detailItem.item)}
+                </Text>
+                {detailItem.item.goldCost > 0 && (
+                  <Text style={[styles.detailGold, { color: theme.colors.gold }]}>
+                    {detailItem.item.goldCost}g
                   </Text>
                 )}
+              </View>
 
-                <View style={styles.detailActions}>
-                  {isEquipped(detailItem.slot, detailItem.item.id) ? (
-                    detailItem.slot !== 'weapon' && (
-                      <Pressable
-                        style={[styles.actionButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}
-                        onPress={() => handleUnequip(detailItem.slot)}
-                      >
-                        <Text style={[styles.actionButtonText, { color: theme.colors.text }]}>Unequip</Text>
-                      </Pressable>
-                    )
-                  ) : (
-                    <Pressable
-                      style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
-                      onPress={() => handleEquip(detailItem.slot, detailItem.item)}
-                    >
-                      <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Equip</Text>
-                    </Pressable>
-                  )}
-
-                  <Pressable
-                    style={[
-                      styles.actionButton,
-                      {
-                        backgroundColor: isEquipped(detailItem.slot, detailItem.item.id)
-                          ? theme.colors.surface
-                          : theme.colors.danger + '20',
-                        borderColor: isEquipped(detailItem.slot, detailItem.item.id)
-                          ? theme.colors.border
-                          : theme.colors.danger,
-                        borderWidth: 1,
-                        opacity: isEquipped(detailItem.slot, detailItem.item.id) ? 0.5 : 1,
-                      },
-                    ]}
-                    onPress={() => handleDiscard(detailItem.slot, detailItem.item.id)}
-                    disabled={isEquipped(detailItem.slot, detailItem.item.id)}
-                  >
-                    <Text
-                      style={[
-                        styles.actionButtonText,
-                        {
-                          color: isEquipped(detailItem.slot, detailItem.item.id)
-                            ? theme.colors.textSecondary
-                            : theme.colors.danger,
-                        },
-                      ]}
-                    >
-                      {isEquipped(detailItem.slot, detailItem.item.id) ? 'Unequip first' : 'Discard'}
-                    </Text>
-                  </Pressable>
-                </View>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
-
-      {/* Add from Catalog Modal */}
-      <Modal
-        visible={showAddModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowAddModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-                Add Equipment
-              </Text>
-              <Pressable onPress={() => setShowAddModal(false)}>
-                <Ionicons name="close" size={28} color={theme.colors.text} />
-              </Pressable>
-            </View>
-
-            <SectionList
-              sections={catalogSections}
-              keyExtractor={(item) => item.id}
-              renderSectionHeader={({ section }) => (
-                <Text
-                  style={[
-                    styles.sectionHeader,
-                    { backgroundColor: theme.colors.surfaceVariant, color: theme.colors.text },
-                  ]}
-                >
-                  {section.title}
+              {detailItem.item.description && (
+                <Text style={[styles.detailDesc, { color: theme.colors.textSecondary }]}>
+                  {detailItem.item.description}
                 </Text>
               )}
-              renderItem={({ item, section }) => {
-                const alreadyOwned = isOwned(section.slot, item.id);
-                return (
+
+              <View style={styles.detailActions}>
+                {isEquipped(detailItem.slot, detailItem.item.id) ? (
+                  detailItem.slot !== 'weapon' && (
+                    <Pressable
+                      style={[styles.actionButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}
+                      onPress={() => handleUnequip(detailItem.slot)}
+                    >
+                      <Text style={[styles.actionButtonText, { color: theme.colors.text }]}>Unequip</Text>
+                    </Pressable>
+                  )
+                ) : (
                   <Pressable
+                    style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
+                    onPress={() => handleEquip(detailItem.slot, detailItem.item)}
+                  >
+                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Equip</Text>
+                  </Pressable>
+                )}
+
+                <Pressable
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: isEquipped(detailItem.slot, detailItem.item.id)
+                        ? theme.colors.surface
+                        : theme.colors.danger + '20',
+                      borderColor: isEquipped(detailItem.slot, detailItem.item.id)
+                        ? theme.colors.border
+                        : theme.colors.danger,
+                      borderWidth: 1,
+                      opacity: isEquipped(detailItem.slot, detailItem.item.id) ? 0.5 : 1,
+                    },
+                  ]}
+                  onPress={() => handleDiscard(detailItem.slot, detailItem.item.id)}
+                  disabled={isEquipped(detailItem.slot, detailItem.item.id)}
+                >
+                  <Text
                     style={[
-                      styles.catalogItem,
+                      styles.actionButtonText,
                       {
-                        backgroundColor: alreadyOwned ? theme.colors.surface : theme.colors.surface,
-                        borderColor: theme.colors.border,
-                        opacity: alreadyOwned ? 0.5 : 1,
+                        color: isEquipped(detailItem.slot, detailItem.item.id)
+                          ? theme.colors.textSecondary
+                          : theme.colors.danger,
                       },
                     ]}
-                    onPress={() => handleAdd(section.slot, item)}
-                    disabled={alreadyOwned}
                   >
-                    <View style={styles.catalogInfo}>
-                      <Text style={[styles.catalogName, { color: theme.colors.text }]}>
-                        {item.name}
-                        {alreadyOwned && ' (owned)'}
-                      </Text>
-                      {item.description && (
-                        <Text
-                          style={[styles.catalogDesc, { color: theme.colors.textSecondary }]}
-                          numberOfLines={1}
-                        >
-                          {item.description}
-                        </Text>
-                      )}
-                    </View>
-                    <View style={styles.catalogStats}>
-                      <Text style={[styles.catalogStatValue, { color: theme.colors.accent }]}>
-                        {getStatLabel(section.slot, item)}
-                      </Text>
-                      {item.goldCost > 0 && (
-                        <Text style={[styles.catalogGold, { color: theme.colors.gold }]}>
-                          {item.goldCost}g
-                        </Text>
-                      )}
-                    </View>
-                  </Pressable>
-                );
-              }}
-            />
-          </View>
+                    {isEquipped(detailItem.slot, detailItem.item.id) ? 'Unequip first' : 'Discard'}
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          )}
+        </BottomSheetScrollView>
+      </BottomSheetModal>
+
+      {/* Catalog Sheet */}
+      <BottomSheetModal
+        ref={catalogSheetRef}
+        snapPoints={catalogSnapPoints}
+        backdropComponent={renderBackdrop}
+        enableDynamicSizing={false}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.textSecondary }}
+      >
+        <View style={styles.modalHeader}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Add Equipment
+          </Text>
+          <Pressable onPress={() => catalogSheetRef.current?.dismiss()}>
+            <Ionicons name="close" size={28} color={theme.colors.text} />
+          </Pressable>
         </View>
-      </Modal>
+
+        <BottomSheetSectionList
+          sections={catalogSections}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          renderSectionHeader={({ section }) => (
+            <Text
+              style={[
+                styles.sectionHeader,
+                { backgroundColor: theme.colors.surfaceVariant, color: theme.colors.text },
+              ]}
+            >
+              {section.title}
+            </Text>
+          )}
+          renderItem={({ item, section }) => {
+            const alreadyOwned = isOwned(section.slot, item.id);
+            return (
+              <Pressable
+                style={[
+                  styles.catalogItem,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                    opacity: alreadyOwned ? 0.5 : 1,
+                  },
+                ]}
+                onPress={() => handleAdd(section.slot, item)}
+                disabled={alreadyOwned}
+              >
+                <View style={styles.catalogInfo}>
+                  <Text style={[styles.catalogName, { color: theme.colors.text }]}>
+                    {item.name}
+                    {alreadyOwned && ' (owned)'}
+                  </Text>
+                  {item.description && (
+                    <Text
+                      style={[styles.catalogDesc, { color: theme.colors.textSecondary }]}
+                      numberOfLines={1}
+                    >
+                      {item.description}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.catalogStats}>
+                  <Text style={[styles.catalogStatValue, { color: theme.colors.accent }]}>
+                    {getStatLabel(section.slot, item)}
+                  </Text>
+                  {item.goldCost > 0 && (
+                    <Text style={[styles.catalogGold, { color: theme.colors.gold }]}>
+                      {item.goldCost}g
+                    </Text>
+                  )}
+                </View>
+              </Pressable>
+            );
+          }}
+        />
+      </BottomSheetModal>
     </View>
   );
 };
@@ -469,23 +479,16 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    maxHeight: '70%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 16,
+  sheetContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 20,
   },
   modalTitle: {
     fontSize: 20,
@@ -521,6 +524,7 @@ const styles = StyleSheet.create({
   },
   detailActions: {
     gap: 10,
+    paddingBottom: 24,
   },
   actionButton: {
     paddingVertical: 12,
@@ -530,6 +534,10 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   sectionHeader: {
     fontSize: 12,
