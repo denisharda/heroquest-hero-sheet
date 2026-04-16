@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Linking from 'expo-linking';
+import { makeRedirectUri } from 'expo-auth-session';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
@@ -14,8 +14,11 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 });
 
-/** Deep link URL that Supabase redirects to after email verification. */
-export const AUTH_CALLBACK_URL = Linking.createURL('auth/callback');
+/** Deep link URL that Supabase redirects to after email verification/reset. */
+export const AUTH_CALLBACK_URL = makeRedirectUri({
+  scheme: 'heroquest',
+  path: 'auth/callback',
+});
 
 /**
  * Extract session tokens and optional type from a Supabase auth callback URL.
