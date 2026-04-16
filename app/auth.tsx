@@ -682,7 +682,7 @@ export default function AuthScreen() {
         ]}
       >
         <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-          <Pressable onPress={() => setMode('choice')} style={styles.backButton}>
+          <Pressable onPress={() => { setMode('choice'); setError(null); }} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </Pressable>
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
@@ -829,7 +829,7 @@ export default function AuthScreen() {
         {/* Email/Password */}
         <Pressable
           style={[styles.providerButton, { backgroundColor: theme.colors.accent }]}
-          onPress={() => setMode('signin')}
+          onPress={() => { setMode('signin'); setError(null); }}
           disabled={loading}
         >
           <Ionicons name="mail" size={20} color={theme.colors.textOnAccent} />
@@ -841,7 +841,7 @@ export default function AuthScreen() {
             styles.providerButton,
             { backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border },
           ]}
-          onPress={() => setMode('signup')}
+          onPress={() => { setMode('signup'); setError(null); }}
           disabled={loading}
         >
           <Ionicons name="person-add" size={20} color={theme.colors.text} />
