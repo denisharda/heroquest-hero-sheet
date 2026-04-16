@@ -401,6 +401,146 @@ export default function AuthScreen() {
     );
   }
 
+  // --- Forgot Password Screen ---
+  if (mode === 'forgot') {
+    return (
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+          <Pressable onPress={() => { setMode('signin'); setError(null); setResetEmailSent(false); }} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+            Forgot Password
+          </Text>
+          <View style={{ width: 40 }} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.content}>
+          {resetEmailSent ? (
+            <>
+              <Ionicons
+                name="mail-open-outline"
+                size={64}
+                color={theme.colors.accent}
+                style={styles.heroIcon}
+              />
+              <Text style={[styles.title, { color: theme.colors.text }]}>
+                Check Your Email
+              </Text>
+              <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+                We sent a password reset link to{'\n'}
+                <Text style={{ fontWeight: '700', color: theme.colors.text }}>{email}</Text>
+                {'\n\n'}Open the link to set a new password.
+              </Text>
+
+              {error && (
+                <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
+                  <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
+                </View>
+              )}
+
+              <Pressable
+                style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
+                onPress={() => { setMode('signin'); setError(null); setResetEmailSent(false); }}
+              >
+                <Text style={styles.primaryButtonText}>Back to Sign In</Text>
+              </Pressable>
+
+              <Pressable
+                style={[
+                  styles.providerButton,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderWidth: 1,
+                    borderColor: theme.colors.border,
+                    opacity: resendCooldown > 0 ? 0.5 : 1,
+                  },
+                ]}
+                onPress={handleSendPasswordReset}
+                disabled={loading || resendCooldown > 0}
+              >
+                {loading ? (
+                  <ActivityIndicator color={theme.colors.text} />
+                ) : (
+                  <>
+                    <Ionicons name="refresh" size={20} color={theme.colors.text} />
+                    <Text style={[styles.providerButtonText, { color: theme.colors.text }]}>
+                      {resendCooldown > 0
+                        ? `Resend in ${resendCooldown}s`
+                        : 'Resend Reset Email'}
+                    </Text>
+                  </>
+                )}
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Ionicons
+                name="lock-open-outline"
+                size={64}
+                color={theme.colors.accent}
+                style={styles.heroIcon}
+              />
+              <Text style={[styles.title, { color: theme.colors.text }]}>
+                Reset Password
+              </Text>
+              <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+                Enter your email address and we'll send you a link to reset your password.
+              </Text>
+
+              {error && (
+                <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
+                  <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
+                </View>
+              )}
+
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    color: theme.colors.text,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                placeholder="Email"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+              />
+
+              <Pressable
+                style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
+                onPress={handleSendPasswordReset}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color={theme.colors.textOnAccent} />
+                ) : (
+                  <Text style={styles.primaryButtonText}>Send Reset Link</Text>
+                )}
+              </Pressable>
+            </>
+          )}
+        </ScrollView>
+
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={theme.colors.accent} />
+          </View>
+        )}
+      </View>
+    );
+  }
+
   // --- Signed Out: Email Form ---
   if (mode === 'signin' || mode === 'signup') {
     return (
