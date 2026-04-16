@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -49,6 +49,17 @@ export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, []);
 
   // Show expired-link error if redirected from deep link handler
   useEffect(() => {
@@ -56,6 +67,29 @@ export default function AuthScreen() {
       setError('Your reset link has expired. Please request a new one.');
     }
   }, [params.error]);
+
+  // Fall back to forgot mode if reset screen has no active session
+  useEffect(() => {
+    if (mode === 'reset' && !isAuthenticated) {
+      setMode('forgot');
+      setError('Your reset link has expired. Please request a new one.');
+    }
+  }, [mode, isAuthenticated]);
+
+  const startCooldown = useCallback(() => {
+    if (cooldownRef.current) clearInterval(cooldownRef.current);
+    setResendCooldown(60);
+    cooldownRef.current = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          if (cooldownRef.current) clearInterval(cooldownRef.current);
+          cooldownRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
 
   const handleEmailAuth = async () => {
     if (!email.trim() || !password.trim()) {
@@ -94,23 +128,12 @@ export default function AuthScreen() {
     try {
       await resendVerificationEmail(email.trim());
       setLoading(false);
-      setResendCooldown(60);
-      const interval = setInterval(() => {
-        setResendCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      startCooldown();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to resend email');
       setLoading(false);
     }
   };
-
-  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const handleSendPasswordReset = async () => {
     if (!email.trim()) {
@@ -123,24 +146,12 @@ export default function AuthScreen() {
       await sendPasswordReset(email.trim());
       setLoading(false);
       setResetEmailSent(true);
-      setResendCooldown(60);
-      const interval = setInterval(() => {
-        setResendCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      startCooldown();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send reset email');
       setLoading(false);
     }
   };
-
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
   const handleUpdatePassword = async () => {
     if (!newPassword.trim()) {
