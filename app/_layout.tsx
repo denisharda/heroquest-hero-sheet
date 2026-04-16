@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -64,23 +64,13 @@ function SyncLifecycle() {
   return null;
 }
 
-/** Listens for deep link auth callbacks and establishes the Supabase session. */
+/** Listens for deep link auth callbacks (email verification) and establishes the Supabase session. */
 function AuthDeepLinkHandler() {
   useEffect(() => {
     const handleUrl = async (url: string) => {
-      const result = extractSessionFromUrl(url);
-      if (!result) return;
-
-      const { type, ...tokens } = result;
-      try {
-        await supabase.auth.setSession(tokens);
-        if (type === 'recovery') {
-          router.replace('/auth?mode=reset');
-        }
-      } catch {
-        // Token expired or invalid — send user to forgot screen with error
-        router.replace('/auth?mode=forgot&error=expired');
-      }
+      const tokens = extractSessionFromUrl(url);
+      if (!tokens) return;
+      await supabase.auth.setSession(tokens);
     };
 
     // Handle URL that launched the app (cold start)

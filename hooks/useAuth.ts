@@ -59,9 +59,12 @@ export const useAuth = () => {
   }, []);
 
   const sendPasswordReset = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: AUTH_CALLBACK_URL,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) throw error;
+  }, []);
+
+  const verifyRecoveryOtp = useCallback(async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' });
     if (error) throw error;
   }, []);
 
@@ -94,6 +97,7 @@ export const useAuth = () => {
     signUpWithEmail,
     resendVerificationEmail,
     sendPasswordReset,
+    verifyRecoveryOtp,
     updatePassword,
     signInWithEmail,
     signOut,

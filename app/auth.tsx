@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { PURE_COLORS } from '@/constants/colors';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
@@ -31,18 +31,14 @@ export default function AuthScreen() {
     signUpWithEmail,
     resendVerificationEmail,
     sendPasswordReset,
+    verifyRecoveryOtp,
     updatePassword,
     signOut,
     deleteAccount,
   } = useAuth();
   const { isSyncing, lastSyncedAt, syncError, syncNow, fetchRestorableHeroes } = useSync();
 
-  const params = useLocalSearchParams<{ mode?: string; error?: string }>();
-  const [mode, setMode] = useState<AuthMode>(() => {
-    if (params.mode === 'reset') return 'reset';
-    if (params.mode === 'forgot') return 'forgot';
-    return 'choice';
-  });
+  const [mode, setMode] = useState<AuthMode>('choice');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -50,6 +46,7 @@ export default function AuthScreen() {
   const [error, setError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
@@ -60,21 +57,6 @@ export default function AuthScreen() {
       if (cooldownRef.current) clearInterval(cooldownRef.current);
     };
   }, []);
-
-  // Show expired-link error if redirected from deep link handler
-  useEffect(() => {
-    if (params.error === 'expired') {
-      setError('Your reset link has expired. Please request a new one.');
-    }
-  }, [params.error]);
-
-  // Fall back to forgot mode if reset screen has no active session
-  useEffect(() => {
-    if (mode === 'reset' && !isAuthenticated) {
-      setMode('forgot');
-      setError('Your reset link has expired. Please request a new one.');
-    }
-  }, [mode, isAuthenticated]);
 
   const startCooldown = useCallback(() => {
     if (cooldownRef.current) clearInterval(cooldownRef.current);
@@ -149,6 +131,23 @@ export default function AuthScreen() {
       startCooldown();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send reset email');
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode.trim()) {
+      setError('Please enter the code from your email');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await verifyRecoveryOtp(email.trim(), otpCode.trim());
+      setLoading(false);
+      setMode('reset');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invalid or expired code');
       setLoading(false);
     }
   };
@@ -435,18 +434,18 @@ export default function AuthScreen() {
           {resetEmailSent ? (
             <>
               <Ionicons
-                name="mail-open-outline"
+                name="key-outline"
                 size={64}
                 color={theme.colors.accent}
                 style={styles.heroIcon}
               />
               <Text style={[styles.title, { color: theme.colors.text }]}>
-                Check Your Email
+                Enter Code
               </Text>
               <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-                We sent a password reset link to{'\n'}
+                We sent a recovery code to{'\n'}
                 <Text style={{ fontWeight: '700', color: theme.colors.text }}>{email}</Text>
-                {'\n\n'}Open the link to set a new password.
+                {'\n\n'}Enter the code below to reset your password.
               </Text>
 
               {error && (
@@ -455,11 +454,35 @@ export default function AuthScreen() {
                 </View>
               )}
 
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.otpInput,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    color: theme.colors.text,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                placeholder="Enter code"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={otpCode}
+                onChangeText={setOtpCode}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="number-pad"
+              />
+
               <Pressable
                 style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
-                onPress={() => { setMode('signin'); setError(null); setResetEmailSent(false); }}
+                onPress={handleVerifyOtp}
+                disabled={loading}
               >
-                <Text style={styles.primaryButtonText}>Back to Sign In</Text>
+                {loading ? (
+                  <ActivityIndicator color={theme.colors.textOnAccent} />
+                ) : (
+                  <Text style={styles.primaryButtonText}>Verify Code</Text>
+                )}
               </Pressable>
 
               <Pressable
@@ -483,7 +506,7 @@ export default function AuthScreen() {
                     <Text style={[styles.providerButtonText, { color: theme.colors.text }]}>
                       {resendCooldown > 0
                         ? `Resend in ${resendCooldown}s`
-                        : 'Resend Reset Email'}
+                        : 'Resend Code'}
                     </Text>
                   </>
                 )}
@@ -501,7 +524,7 @@ export default function AuthScreen() {
                 Reset Password
               </Text>
               <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-                Enter your email address and we'll send you a link to reset your password.
+                Enter your email address and we'll send you a code to reset your password.
               </Text>
 
               {error && (
@@ -536,7 +559,7 @@ export default function AuthScreen() {
                 {loading ? (
                   <ActivityIndicator color={theme.colors.textOnAccent} />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Send Reset Link</Text>
+                  <Text style={styles.primaryButtonText}>Send Reset Code</Text>
                 )}
               </Pressable>
             </>
@@ -920,6 +943,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 16,
     marginBottom: 12,
+  },
+  otpInput: {
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 8,
   },
   primaryButton: {
     width: '100%',
