@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { PURE_COLORS } from '@/constants/colors';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
@@ -18,7 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSync } from '@/hooks/useSync';
 import { withOpacity } from '@/theme/colorUtils';
 
-type AuthMode = 'choice' | 'signin' | 'signup';
+type AuthMode = 'choice' | 'signin' | 'signup' | 'verify' | 'forgot' | 'reset';
 
 export default function AuthScreen() {
   const { theme } = useTheme();
@@ -29,17 +29,33 @@ export default function AuthScreen() {
     isAuthenticated,
     signInWithEmail,
     signUpWithEmail,
+    resendVerificationEmail,
+    sendPasswordReset,
+    updatePassword,
     signOut,
     deleteAccount,
   } = useAuth();
   const { isSyncing, lastSyncedAt, syncError, syncNow, fetchRestorableHeroes } = useSync();
 
-  const [mode, setMode] = useState<AuthMode>('choice');
+  const params = useLocalSearchParams<{ mode?: string; error?: string }>();
+  const [mode, setMode] = useState<AuthMode>(() => {
+    if (params.mode === 'reset') return 'reset';
+    if (params.mode === 'forgot') return 'forgot';
+    return 'choice';
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // Show expired-link error if redirected from deep link handler
+  useEffect(() => {
+    if (params.error === 'expired') {
+      setError('Your reset link has expired. Please request a new one.');
+    }
+  }, [params.error]);
 
   const handleEmailAuth = async () => {
     if (!email.trim() || !password.trim()) {
@@ -54,14 +70,99 @@ export default function AuthScreen() {
     setError(null);
     try {
       if (mode === 'signup') {
-        await signUpWithEmail(email.trim(), password);
+        const { needsEmailVerification } = await signUpWithEmail(email.trim(), password);
+        setLoading(false);
+        if (needsEmailVerification) {
+          setMode('verify');
+          return;
+        }
       } else {
         await signInWithEmail(email.trim(), password);
+        setLoading(false);
       }
-      setLoading(false);
       router.replace('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (resendCooldown > 0) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await resendVerificationEmail(email.trim());
+      setLoading(false);
+      setResendCooldown(60);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to resend email');
+      setLoading(false);
+    }
+  };
+
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+
+  const handleSendPasswordReset = async () => {
+    if (!email.trim()) {
+      setError('Please enter your email address');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await sendPasswordReset(email.trim());
+      setLoading(false);
+      setResetEmailSent(true);
+      setResendCooldown(60);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send reset email');
+      setLoading(false);
+    }
+  };
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  const handleUpdatePassword = async () => {
+    if (!newPassword.trim()) {
+      setError('Please enter a new password');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await updatePassword(newPassword);
+      setLoading(false);
+      router.replace('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update password');
       setLoading(false);
     }
   };
@@ -203,6 +304,91 @@ export default function AuthScreen() {
             <Text style={[styles.actionText, { color: theme.colors.danger }]}>
               Delete Account
             </Text>
+          </Pressable>
+        </ScrollView>
+
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={theme.colors.accent} />
+          </View>
+        )}
+      </View>
+    );
+  }
+
+  // --- Email Verification Screen ---
+  if (mode === 'verify') {
+    return (
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+          <Pressable onPress={() => { setMode('choice'); setError(null); }} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+            Verify Email
+          </Text>
+          <View style={{ width: 40 }} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.content}>
+          <Ionicons
+            name="mail-open-outline"
+            size={64}
+            color={theme.colors.accent}
+            style={styles.heroIcon}
+          />
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            Check Your Email
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+            We sent a verification link to{'\n'}
+            <Text style={{ fontWeight: '700', color: theme.colors.text }}>{email}</Text>
+            {'\n\n'}Open the link to activate your account, then come back here to sign in.
+          </Text>
+
+          {error && (
+            <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
+              <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
+            </View>
+          )}
+
+          <Pressable
+            style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
+            onPress={() => { setMode('signin'); setError(null); }}
+          >
+            <Text style={styles.primaryButtonText}>Go to Sign In</Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.providerButton,
+              {
+                backgroundColor: theme.colors.surface,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+                opacity: resendCooldown > 0 ? 0.5 : 1,
+              },
+            ]}
+            onPress={handleResendVerification}
+            disabled={loading || resendCooldown > 0}
+          >
+            {loading ? (
+              <ActivityIndicator color={theme.colors.text} />
+            ) : (
+              <>
+                <Ionicons name="refresh" size={20} color={theme.colors.text} />
+                <Text style={[styles.providerButtonText, { color: theme.colors.text }]}>
+                  {resendCooldown > 0
+                    ? `Resend in ${resendCooldown}s`
+                    : 'Resend Verification Email'}
+                </Text>
+              </>
+            )}
           </Pressable>
         </ScrollView>
 
