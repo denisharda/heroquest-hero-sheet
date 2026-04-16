@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, AUTH_CALLBACK_URL } from '@/lib/supabase';
 import { AuthUser } from '@/types';
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
@@ -37,8 +37,36 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUpWithEmail = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
+  const signUpWithEmail = useCallback(async (email: string, password: string): Promise<{ needsEmailVerification: boolean }> => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: AUTH_CALLBACK_URL },
+    });
+    if (error) throw error;
+    // When email confirmation is enabled, Supabase returns a user but no session
+    const needsEmailVerification = !!data.user && !data.session;
+    return { needsEmailVerification };
+  }, []);
+
+  const resendVerificationEmail = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: AUTH_CALLBACK_URL },
+    });
+    if (error) throw error;
+  }, []);
+
+  const sendPasswordReset = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: AUTH_CALLBACK_URL,
+    });
+    if (error) throw error;
+  }, []);
+
+  const updatePassword = useCallback(async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) throw error;
   }, []);
 
@@ -64,6 +92,9 @@ export const useAuth = () => {
     isAuthenticated: !!session,
     isLoading,
     signUpWithEmail,
+    resendVerificationEmail,
+    sendPasswordReset,
+    updatePassword,
     signInWithEmail,
     signOut,
     deleteAccount,
