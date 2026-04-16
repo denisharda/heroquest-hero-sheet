@@ -220,6 +220,101 @@ export default function AuthScreen() {
     return new Date(lastSyncedAt).toLocaleTimeString();
   };
 
+  // --- Set New Password Screen (must be before isAuthenticated check) ---
+  if (mode === 'reset') {
+    return (
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+          <Pressable onPress={() => { setMode('choice'); setError(null); }} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+            Set New Password
+          </Text>
+          <View style={{ width: 40 }} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.content}>
+          <Ionicons
+            name="key-outline"
+            size={64}
+            color={theme.colors.accent}
+            style={styles.heroIcon}
+          />
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            New Password
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+            Choose a new password for your account.
+          </Text>
+
+          {error && (
+            <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
+              <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
+            </View>
+          )}
+
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.colors.surface,
+                color: theme.colors.text,
+                borderColor: theme.colors.border,
+              },
+            ]}
+            placeholder="New Password"
+            placeholderTextColor={theme.colors.textSecondary}
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
+            textContentType="newPassword"
+          />
+
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.colors.surface,
+                color: theme.colors.text,
+                borderColor: theme.colors.border,
+              },
+            ]}
+            placeholder="Confirm New Password"
+            placeholderTextColor={theme.colors.textSecondary}
+            value={confirmNewPassword}
+            onChangeText={setConfirmNewPassword}
+            secureTextEntry
+            textContentType="newPassword"
+          />
+
+          <Pressable
+            style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
+            onPress={handleUpdatePassword}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color={theme.colors.textOnAccent} />
+            ) : (
+              <Text style={styles.primaryButtonText}>Update Password</Text>
+            )}
+          </Pressable>
+        </ScrollView>
+
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={theme.colors.accent} />
+          </View>
+        )}
+      </View>
+    );
+  }
+
   // --- Signed In View ---
   if (isAuthenticated) {
     return (
@@ -564,101 +659,6 @@ export default function AuthScreen() {
               </Pressable>
             </>
           )}
-        </ScrollView>
-
-        {loading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color={theme.colors.accent} />
-          </View>
-        )}
-      </View>
-    );
-  }
-
-  // --- Set New Password Screen ---
-  if (mode === 'reset') {
-    return (
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: theme.colors.background },
-        ]}
-      >
-        <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-          <Pressable onPress={() => { setMode('choice'); setError(null); }} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-          </Pressable>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-            Set New Password
-          </Text>
-          <View style={{ width: 40 }} />
-        </View>
-
-        <ScrollView contentContainerStyle={styles.content}>
-          <Ionicons
-            name="key-outline"
-            size={64}
-            color={theme.colors.accent}
-            style={styles.heroIcon}
-          />
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            New Password
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-            Choose a new password for your account.
-          </Text>
-
-          {error && (
-            <View style={[styles.errorBox, { backgroundColor: withOpacity(theme.colors.danger, 0.13) }]}>
-              <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text>
-            </View>
-          )}
-
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.colors.surface,
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-              },
-            ]}
-            placeholder="New Password"
-            placeholderTextColor={theme.colors.textSecondary}
-            value={newPassword}
-            onChangeText={setNewPassword}
-            secureTextEntry
-            textContentType="newPassword"
-          />
-
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.colors.surface,
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-              },
-            ]}
-            placeholder="Confirm New Password"
-            placeholderTextColor={theme.colors.textSecondary}
-            value={confirmNewPassword}
-            onChangeText={setConfirmNewPassword}
-            secureTextEntry
-            textContentType="newPassword"
-          />
-
-          <Pressable
-            style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
-            onPress={handleUpdatePassword}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={theme.colors.textOnAccent} />
-            ) : (
-              <Text style={styles.primaryButtonText}>Update Password</Text>
-            )}
-          </Pressable>
         </ScrollView>
 
         {loading && (
