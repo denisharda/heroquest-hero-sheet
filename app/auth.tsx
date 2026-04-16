@@ -730,6 +730,17 @@ export default function AuthScreen() {
             )}
           </Pressable>
 
+          {mode === 'signin' && (
+            <Pressable
+              onPress={() => { setError(null); setMode('forgot'); }}
+              style={{ marginBottom: 8 }}
+            >
+              <Text style={[styles.switchText, { color: theme.colors.accent }]}>
+                Forgot password?
+              </Text>
+            </Pressable>
+          )}
+
           <Pressable
             onPress={() => { setConfirmPassword(''); setError(null); setMode(mode === 'signup' ? 'signin' : 'signup'); }}
           >
