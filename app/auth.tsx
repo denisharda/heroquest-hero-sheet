@@ -260,6 +260,7 @@ export default function AuthScreen() {
           )}
 
           <TextInput
+            key="reset-new-password"
             style={[
               styles.input,
               {
@@ -277,6 +278,7 @@ export default function AuthScreen() {
           />
 
           <TextInput
+            key="reset-confirm-password"
             style={[
               styles.input,
               {
