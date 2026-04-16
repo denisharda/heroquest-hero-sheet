@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -12,7 +12,8 @@ import {
   Cinzel_600SemiBold,
   Cinzel_700Bold,
 } from '@expo-google-fonts/cinzel';
-import { supabase } from '@/lib/supabase';
+import * as Linking from 'expo-linking';
+import { supabase, extractSessionFromUrl } from '@/lib/supabase';
 import { syncService } from '@/services/syncService';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
@@ -63,6 +64,41 @@ function SyncLifecycle() {
   return null;
 }
 
+/** Listens for deep link auth callbacks and establishes the Supabase session. */
+function AuthDeepLinkHandler() {
+  useEffect(() => {
+    const handleUrl = async (url: string) => {
+      const result = extractSessionFromUrl(url);
+      if (!result) return;
+
+      const { type, ...tokens } = result;
+      try {
+        await supabase.auth.setSession(tokens);
+        if (type === 'recovery') {
+          router.replace('/auth?mode=reset');
+        }
+      } catch {
+        // Token expired or invalid — send user to forgot screen with error
+        router.replace('/auth?mode=forgot&error=expired');
+      }
+    };
+
+    // Handle URL that launched the app (cold start)
+    Linking.getInitialURL().then((url) => {
+      if (url) handleUrl(url);
+    });
+
+    // Handle URL while app is already running (warm start)
+    const subscription = Linking.addEventListener('url', (event) => {
+      handleUrl(event.url);
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  return null;
+}
+
 function RootLayoutNav() {
   const { theme } = useTheme();
 
@@ -70,6 +106,7 @@ function RootLayoutNav() {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style={theme.isDark ? 'light' : 'dark'} />
       <SyncLifecycle />
+      <AuthDeepLinkHandler />
       <Stack
         screenOptions={{
           headerShown: false,
