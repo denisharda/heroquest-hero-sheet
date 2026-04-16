@@ -16,7 +16,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 /** Deep link URL that Supabase redirects to after email verification/reset. */
 export const AUTH_CALLBACK_URL = makeRedirectUri({
-  scheme: 'heroquest',
+  scheme: 'heroquest-charactersheet',
 });
 
 /**
