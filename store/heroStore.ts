@@ -37,24 +37,34 @@ const getMaxMindPoints = (hero: Hero): number => {
   return maxMP;
 };
 
-// Normalize a hero that may be missing ownedEquipment (from old app version or sync)
+// Normalize a hero that may be missing ownedEquipment (from old app version or sync).
+// Always ensures the starting weapon is in the armory so old accounts don't end up
+// with an empty armory after the v3 upgrade.
 const normalizeHeroOwnedEquipment = (hero: any): any => {
-  if (hero.ownedEquipment) return hero;
   const startingWeapon = getWeaponById(STARTING_WEAPONS[hero.heroClass as HeroClassName]);
-  const weapons: Weapon[] = [];
-  if (startingWeapon) weapons.push(startingWeapon);
-  if (hero.equipment?.weapon && hero.equipment.weapon.id !== startingWeapon?.id) {
+  const existing = hero.ownedEquipment ?? {};
+  const weapons: Weapon[] = Array.isArray(existing.weapons) ? [...existing.weapons] : [];
+  const shields: Shield[] = Array.isArray(existing.shields) ? [...existing.shields] : [];
+  const helmets: Helmet[] = Array.isArray(existing.helmets) ? [...existing.helmets] : [];
+  const armor: Armor[] = Array.isArray(existing.armor) ? [...existing.armor] : [];
+
+  if (startingWeapon && !weapons.some((w) => w.id === startingWeapon.id)) {
+    weapons.unshift(startingWeapon);
+  }
+  if (hero.equipment?.weapon && !weapons.some((w) => w.id === hero.equipment.weapon.id)) {
     weapons.push(hero.equipment.weapon);
   }
-  return {
-    ...hero,
-    ownedEquipment: {
-      weapons,
-      shields: hero.equipment?.shield ? [hero.equipment.shield] : [],
-      helmets: hero.equipment?.helmet ? [hero.equipment.helmet] : [],
-      armor: hero.equipment?.armor ? [hero.equipment.armor] : [],
-    },
-  };
+  if (hero.equipment?.shield && !shields.some((s) => s.id === hero.equipment.shield.id)) {
+    shields.push(hero.equipment.shield);
+  }
+  if (hero.equipment?.helmet && !helmets.some((h) => h.id === hero.equipment.helmet.id)) {
+    helmets.push(hero.equipment.helmet);
+  }
+  if (hero.equipment?.armor && !armor.some((a) => a.id === hero.equipment.armor.id)) {
+    armor.push(hero.equipment.armor);
+  }
+
+  return { ...hero, ownedEquipment: { weapons, shields, helmets, armor } };
 };
 
 // Generate unique ID

@@ -83,6 +83,7 @@ export interface Armor {
   description?: string;
   restrictedClasses?: HeroClassName[];
   movementPenalty?: boolean; // Reduces movement to 1d6
+  isArtifact?: boolean;
 }
 
 export interface Equipment {

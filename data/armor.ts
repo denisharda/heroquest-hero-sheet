@@ -10,14 +10,6 @@ export const SHIELDS: Shield[] = [
     restrictedClasses: ['Wizard'],
     description: 'Adds +1 defense die. Cannot be used by Wizards or with two-handed weapons.',
   },
-  {
-    id: 'large-shield',
-    name: 'Large Shield',
-    defendDice: 2,
-    goldCost: 300,
-    restrictedClasses: ['Wizard'],
-    description: 'Adds +2 defense dice. Cannot be used by Wizards or with two-handed weapons. (Expansion)',
-  },
 ];
 
 export const NO_SHIELD: Shield = {
@@ -94,6 +86,26 @@ export const ARMOR: Armor[] = [
     goldCost: 550,
     description: 'These hardened leather bracers give you 1 extra Defend die. May be combined with the helmet and/or shield.',
   },
+
+  // Artifact Armor
+  {
+    id: 'borins-armor',
+    name: "Borin's Armor",
+    defendDice: 2,
+    goldCost: 0,
+    isArtifact: true,
+    restrictedClasses: ['Wizard'],
+    description: 'This magical suit of plate mail gives you 2 extra Defend dice. Unlike normal plate mail, this mysterious, ultralight metal armor does not slow down its wearer. May be combined with the helmet and/or shield. May not be used by the wizard.',
+  },
+  {
+    id: 'wizards-cloak',
+    name: "Wizard's Cloak",
+    defendDice: 1,
+    goldCost: 0,
+    isArtifact: true,
+    restrictedClasses: ['Barbarian', 'Dwarf', 'Elf'],
+    description: 'This magical cloak made of shimmery fabric is covered with mystical runes. It can be worn only by the wizard, giving them 1 extra Defend die.',
+  },
 ];
 
 export const NO_ARMOR: Armor = {
@@ -111,5 +123,5 @@ export const getArmorById = (id: string): Armor | undefined => {
 export const getAvailableArmor = (heroClass: HeroClassName): Armor[] => {
   return ARMOR.filter(
     a => !a.restrictedClasses || !a.restrictedClasses.includes(heroClass)
-  );
+  ).filter(a => !a.isArtifact); // Don't show artifacts in normal selection
 };

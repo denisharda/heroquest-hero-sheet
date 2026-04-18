@@ -202,15 +202,11 @@ export const getItemsByCategory = (category: ItemCategory): ItemDefinition[] => 
   return ITEM_DEFINITIONS.filter(i => i.category === category);
 };
 
-// Artifact passive stat effects (looked up at computation time)
+// Artifact passive stat effects (looked up at computation time).
+// borins-armor and wizards-cloak are intentionally omitted — they are equippable
+// via data/armor.ts (isArtifact: true) and their bonuses apply only when equipped.
 export const ARTIFACT_EFFECTS: Record<string, ArtifactEffect> = {
   'talisman-of-lore': { bonusMindPoints: 1 },
-  'wizards-cloak': { bonusDefendDice: 1, allowedClasses: ['Wizard'] },
-  'borins-armor': {
-    overrideArmorDefend: 4,
-    negatesMovementPenalty: true,
-    allowedClasses: ['Barbarian', 'Dwarf', 'Elf'],
-  },
   'ring-of-fortitude': { bonusBodyPoints: 1 },
 };
 

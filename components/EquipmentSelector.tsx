@@ -12,7 +12,7 @@ import { useTheme } from '@/theme/ThemeContext';
 import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { WEAPONS } from '@/data/weapons';
-import { NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
+import { ARMOR, NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
 import { EquipmentSlotCard } from './EquipmentSlot';
@@ -65,8 +65,20 @@ export const EquipmentSelector: React.FC = () => {
         return [NO_SHIELD, ...(hero.ownedEquipment?.shields ?? [])];
       case 'helmet':
         return [NO_HELMET, ...(hero.ownedEquipment?.helmets ?? [])];
-      case 'armor':
-        return [NO_ARMOR, ...(hero.ownedEquipment?.armor ?? [])];
+      case 'armor': {
+        const owned = hero.ownedEquipment?.armor ?? [];
+        const ownedIds = new Set(owned.map((a) => a.id));
+        const inventoryArtifactIds = hero.inventory
+          .filter((i) => i.category === 'artifact')
+          .map((i) => i.id);
+        const artifactArmor = ARMOR.filter(
+          (a) => a.isArtifact
+            && inventoryArtifactIds.includes(a.id)
+            && !ownedIds.has(a.id)
+            && (!a.restrictedClasses || !a.restrictedClasses.includes(hero.heroClass))
+        );
+        return [NO_ARMOR, ...owned, ...artifactArmor];
+      }
       default:
         return [];
     }
@@ -145,7 +157,7 @@ export const EquipmentSelector: React.FC = () => {
         <EquipmentSlotCard
           slotType="armor"
           item={hero.equipment.armor}
-          isArtifact={false}
+          isArtifact={hero.equipment.armor?.isArtifact ?? false}
           isDisabled={false}
           onPress={() => openSelector('armor')}
         />
