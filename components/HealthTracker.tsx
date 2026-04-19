@@ -20,6 +20,7 @@ interface PointTrackerProps {
   icon: string;
   onTap: () => void;
   onLongPress: () => void;
+  onReset?: () => void;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -33,6 +34,7 @@ const PointTracker: React.FC<PointTrackerProps> = ({
   icon,
   onTap,
   onLongPress,
+  onReset,
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -90,9 +92,29 @@ const PointTracker: React.FC<PointTrackerProps> = ({
       ]}
     >
       <View style={styles.trackerHeader}>
-        <Text style={[styles.trackerLabel, { color: theme.colors.text }]}>
-          {label}
-        </Text>
+        <View style={styles.trackerLabelRow}>
+          <Text style={[styles.trackerLabel, { color: theme.colors.text }]}>
+            {label}
+          </Text>
+          {onReset && (
+            <Pressable
+              onPress={onReset}
+              style={({ pressed }) => [
+                styles.resetButton,
+                {
+                  borderColor: theme.colors.border,
+                  opacity: pressed ? 0.6 : 1,
+                },
+              ]}
+              hitSlop={8}
+            >
+              <FontAwesome5 name="redo" size={10} color={theme.colors.textSecondary} solid />
+              <Text style={[styles.resetButtonLabel, { color: theme.colors.textSecondary }]}>
+                Reset
+              </Text>
+            </Pressable>
+          )}
+        </View>
         <Text style={[styles.trackerValue, { color: filledColor }]}>
           {current} / {max}
         </Text>
@@ -118,25 +140,6 @@ export const HealthTracker: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <Pressable
-          onPress={handleReset}
-          style={({ pressed }) => [
-            styles.resetButton,
-            {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-              opacity: pressed ? 0.6 : 1,
-            },
-          ]}
-          hitSlop={8}
-        >
-          <FontAwesome5 name="redo" size={12} color={theme.colors.textSecondary} solid />
-          <Text style={[styles.resetButtonLabel, { color: theme.colors.textSecondary }]}>
-            Reset
-          </Text>
-        </Pressable>
-      </View>
       <PointTracker
         label="BODY POINTS"
         current={hero.currentBodyPoints}
@@ -146,6 +149,7 @@ export const HealthTracker: React.FC = () => {
         icon="heart"
         onTap={() => adjustBodyPoints(-1)}
         onLongPress={() => adjustBodyPoints(1)}
+        onReset={handleReset}
       />
     </View>
   );
@@ -155,22 +159,22 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 12,
   },
-  headerRow: {
+  trackerLabelRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: 8,
+    alignItems: 'center',
+    gap: 8,
   },
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
     borderWidth: 1,
   },
   resetButtonLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.4,
     textTransform: 'uppercase',
