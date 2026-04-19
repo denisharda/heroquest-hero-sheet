@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
+import { SPACING } from '@/constants/spacing';
 
 interface Props {
   count: number;
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    marginTop: 8,
+    marginBottom: SPACING.section,
   },
   left: {
     flexDirection: 'row',

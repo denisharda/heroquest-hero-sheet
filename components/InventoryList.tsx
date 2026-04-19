@@ -14,6 +14,7 @@ import { useHero } from '@/hooks/useHero';
 import { ITEM_DEFINITIONS, ITEM_CATEGORIES, createItemInstance } from '@/data/items';
 import { Item, ItemCategory } from '@/types';
 import { getCategoryColor } from '@/theme/colorHelpers';
+import { SPACING } from '@/constants/spacing';
 import * as Haptics from 'expo-haptics';
 
 interface InventoryItemProps {
@@ -244,7 +245,7 @@ export const InventoryList: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   header: {
     flexDirection: 'row',

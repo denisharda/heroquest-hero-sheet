@@ -8,6 +8,7 @@ import { useHero } from '@/hooks/useHero';
 import { getSpellsBySchool, SPELL_SCHOOLS } from '@/data/spells';
 import { SpellSchool, Spell } from '@/types';
 import { getSchoolColor } from '@/theme/colorHelpers';
+import { SPACING } from '@/constants/spacing';
 import * as Haptics from 'expo-haptics';
 
 interface SpellItemProps {
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   header: {
     flexDirection: 'row',

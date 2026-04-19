@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
+import { SPACING } from '@/constants/spacing';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
@@ -151,7 +152,7 @@ export const HealthTracker: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   trackerLabelRow: {
     flexDirection: 'row',
@@ -174,7 +175,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   trackerContainer: {
-    marginBottom: 8,
     paddingVertical: 4,
   },
   trackerHeader: {

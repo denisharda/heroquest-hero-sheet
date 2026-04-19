@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/theme/ThemeContext';
 import { PURE_COLORS } from '@/constants/colors';
+import { SPACING } from '@/constants/spacing';
 import { useHero } from '@/hooks/useHero';
 import { PlaceholderPortrait } from './PlaceholderPortrait';
 import { HERO_CLASSES } from '@/data/heroes';
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   inputsContainer: {
     flex: 1,

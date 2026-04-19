@@ -5,6 +5,7 @@ import { useTheme } from '@/theme/ThemeContext';
 import { useHero } from '@/hooks/useHero';
 import { QUESTS } from '@/data/quests';
 import { OVERLAY_COLORS } from '@/constants/colors';
+import { SPACING } from '@/constants/spacing';
 import * as Haptics from 'expo-haptics';
 
 const TOTAL_QUESTS = 14;
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   header: {
     flexDirection: 'row',

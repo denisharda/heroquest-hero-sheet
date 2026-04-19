@@ -13,6 +13,7 @@ import { withOpacity } from '@/theme/colorUtils';
 import { useHero } from '@/hooks/useHero';
 import { WEAPONS } from '@/data/weapons';
 import { ARMOR, NO_SHIELD, NO_HELMET, NO_ARMOR } from '@/data/armor';
+import { SPACING } from '@/constants/spacing';
 import { Weapon, Shield, Helmet, Armor, EquipmentSlot } from '@/types';
 import * as Haptics from 'expo-haptics';
 import { EquipmentSlotCard } from './EquipmentSlot';
@@ -252,7 +253,7 @@ export const EquipmentSelector: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   sectionTitle: {
     fontSize: 14,

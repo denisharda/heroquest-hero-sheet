@@ -11,6 +11,7 @@ import { BottomSheetModal, BottomSheetBackdrop, BottomSheetSectionList, BottomSh
 import { useTheme } from '@/theme/ThemeContext';
 import { withOpacity } from '@/theme/colorUtils';
 import { PURE_COLORS } from '@/constants/colors';
+import { SPACING } from '@/constants/spacing';
 import { useHero } from '@/hooks/useHero';
 import { getAvailableWeapons, WEAPONS } from '@/data/weapons';
 import { getAvailableShields, getAvailableHelmets, getAvailableArmor } from '@/data/armor';
@@ -408,7 +409,7 @@ export const ArmoryList: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: SPACING.section,
   },
   header: {
     flexDirection: 'row',
