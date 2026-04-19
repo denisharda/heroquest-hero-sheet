@@ -23,8 +23,6 @@ interface PointTrackerProps {
   onReset?: () => void;
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 const PointTracker: React.FC<PointTrackerProps> = ({
   label,
   current,
@@ -81,10 +79,7 @@ const PointTracker: React.FC<PointTrackerProps> = ({
   }
 
   return (
-    <AnimatedPressable
-      onPress={handlePress}
-      onLongPress={handleLongPress}
-      delayLongPress={300}
+    <Animated.View
       style={[
         styles.trackerContainer,
         { backgroundColor: theme.colors.surface },
@@ -119,11 +114,18 @@ const PointTracker: React.FC<PointTrackerProps> = ({
           {current} / {max}
         </Text>
       </View>
-      <View style={styles.pointsRow}>{points}</View>
-      <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-        Tap to damage • Long press to heal
-      </Text>
-    </AnimatedPressable>
+      <Pressable
+        onPress={handlePress}
+        onLongPress={handleLongPress}
+        delayLongPress={300}
+        style={styles.pointsPressable}
+      >
+        <View style={styles.pointsRow}>{points}</View>
+        <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
+          Tap to damage • Long press to heal
+        </Text>
+      </Pressable>
+    </Animated.View>
   );
 };
 
@@ -198,6 +200,9 @@ const styles = StyleSheet.create({
   trackerValue: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  pointsPressable: {
+    borderRadius: 8,
   },
   pointsRow: {
     flexDirection: 'row',
