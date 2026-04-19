@@ -11,3 +11,5 @@ export { HeroSwitcher } from './HeroSwitcher';
 export { ThemeToggle } from './ThemeToggle';
 export { PlaceholderPortrait } from './PlaceholderPortrait';
 export { ConflictResolver } from './ConflictResolver';
+export { ActiveEffectsButton } from './ActiveEffectsButton';
+export { ActiveEffectsSheet } from './ActiveEffectsSheet';
