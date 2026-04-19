@@ -15,14 +15,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.heroquest.herosheet"
+      "bundleIdentifier": "com.vectolis.heroquestherosheet"
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F5E6C8"
       },
-      "package": "com.heroquest.herosheet"
+      "package": "com.vectolis.heroquestherosheet"
     },
     "web": {
       "bundler": "metro",
@@ -31,7 +32,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "./plugins/withAndroidSigning.js"
     ],
     "experiments": {
       "typedRoutes": true
