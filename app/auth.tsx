@@ -27,6 +27,7 @@ export default function AuthScreen() {
   const {
     user,
     isAuthenticated,
+    isLoading: isAuthLoading,
     signInWithEmail,
     signUpWithEmail,
     resendVerificationEmail,
@@ -219,6 +220,19 @@ export default function AuthScreen() {
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
     return new Date(lastSyncedAt).toLocaleTimeString();
   };
+
+  if (isAuthLoading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.colors.background, justifyContent: 'center', alignItems: 'center' },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.accent} />
+      </View>
+    );
+  }
 
   // --- Set New Password Screen (must be before isAuthenticated check) ---
   if (mode === 'reset') {
