@@ -107,12 +107,36 @@ const PointTracker: React.FC<PointTrackerProps> = ({
 
 export const HealthTracker: React.FC = () => {
   const { theme } = useTheme();
-  const { hero, computedStats, adjustBodyPoints } = useHero();
+  const { hero, computedStats, adjustBodyPoints, setBodyPoints } = useHero();
 
   if (!hero || !computedStats) return null;
 
+  const handleReset = async () => {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setBodyPoints(computedStats.maxBodyPoints);
+  };
+
   return (
     <View style={styles.container}>
+      <View style={styles.headerRow}>
+        <Pressable
+          onPress={handleReset}
+          style={({ pressed }) => [
+            styles.resetButton,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              opacity: pressed ? 0.6 : 1,
+            },
+          ]}
+          hitSlop={8}
+        >
+          <FontAwesome5 name="redo" size={12} color={theme.colors.textSecondary} solid />
+          <Text style={[styles.resetButtonLabel, { color: theme.colors.textSecondary }]}>
+            Reset
+          </Text>
+        </Pressable>
+      </View>
       <PointTracker
         label="BODY POINTS"
         current={hero.currentBodyPoints}
@@ -130,6 +154,26 @@ export const HealthTracker: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 12,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 8,
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  resetButtonLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
   trackerContainer: {
     padding: 16,
