@@ -1,3 +1,3 @@
 export const SPACING = {
-  section: 12,
+  section: 14,
 } as const;
