@@ -8,6 +8,7 @@ interface ItemDefinition {
   description: string;
   goldCost: number;
   pack?: QuestPack;
+  shortEffect?: string;
 }
 
 export const ITEM_DEFINITIONS: ItemDefinition[] = [
@@ -57,6 +58,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     category: 'artifact',
     description: 'This magical medallion increases your Mind Points by 1 for as long as it is worn.',
     goldCost: 0,
+    shortEffect: '+1 Mind Point',
   },
   {
     id: 'wizards-cloak',
@@ -78,6 +80,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     category: 'artifact',
     description: 'This magical wand allows a hero to cast two separate and different spells on their turn instead of one single spell.',
     goldCost: 0,
+    shortEffect: 'Cast 2 different spells per turn',
   },
   {
     id: 'elixir-of-life',
@@ -92,6 +95,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     category: 'artifact',
     description: 'When invoked, this magical ring returns all heroes that the ring wearer can see to the starting point of the quest. It can only be used once.',
     goldCost: 0,
+    shortEffect: 'Teleport all visible heroes to the stairway (one use)',
   },
   {
     id: 'orcs-bane',
@@ -120,6 +124,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     category: 'artifact',
     description: 'This ring enables a hero to cast one spell two times (not simultaneously). At the beginning of a quest, the wearer of this ring must declare which of their spells is stored in the ring.',
     goldCost: 0,
+    shortEffect: 'Cast one spell twice per quest',
   },
   {
     id: 'rod-of-telekinesis',
@@ -134,6 +139,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     category: 'artifact',
     description: 'This magical ring raises a hero\'s Body Points by 1.',
     goldCost: 0,
+    shortEffect: '+1 Body Point',
   },
   {
     id: 'fortunes-longsword',
