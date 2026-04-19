@@ -77,13 +77,7 @@ const PointTracker: React.FC<PointTrackerProps> = ({
   }
 
   return (
-    <Animated.View
-      style={[
-        styles.trackerContainer,
-        { backgroundColor: theme.colors.surface },
-        animatedContainerStyle,
-      ]}
-    >
+    <Animated.View style={[styles.trackerContainer, animatedContainerStyle]}>
       <View style={styles.trackerHeader}>
         <View style={styles.trackerLabelRow}>
           <Text style={[styles.trackerLabel, { color: theme.colors.text }]}>
@@ -180,9 +174,8 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   trackerContainer: {
-    padding: 16,
-    borderRadius: 12,
     marginBottom: 8,
+    paddingVertical: 4,
   },
   trackerHeader: {
     flexDirection: 'row',
