@@ -95,7 +95,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     category: 'artifact',
     description: 'When invoked, this magical ring returns all heroes that the ring wearer can see to the starting point of the quest. It can only be used once.',
     goldCost: 0,
-    shortEffect: 'Teleport all visible heroes to the stairway (one use)',
+    shortEffect: 'Return all visible heroes to quest start (one use)',
   },
   {
     id: 'orcs-bane',
