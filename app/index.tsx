@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { useAuth } from '@/hooks/useAuth';
 import { useSync } from '@/hooks/useSync';
 import { isOnboardingComplete } from './onboarding';
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { getActiveEffects } from '@/lib/activeEffects';
 import {
   HeroIdentity,
   StatBlock,
@@ -31,6 +33,8 @@ import {
   HeroSwitcher,
   ThemeToggle,
   ConflictResolver,
+  ActiveEffectsButton,
+  ActiveEffectsSheet,
 } from '@/components';
 
 export default function CharacterSheet() {
@@ -42,6 +46,15 @@ export default function CharacterSheet() {
   const { isSyncing, syncError, conflicts, resolveConflicts, cancelConflicts, pendingRestoreCount, showPendingRestores, autoShowRestores } = useSync();
   const [showHeroSwitcher, setShowHeroSwitcher] = useState(false);
   const insets = useSafeAreaInsets();
+
+  const activeEffectsRef = useRef<BottomSheetModal>(null);
+
+  const activeEffects = useMemo(
+    () => (hero ? getActiveEffects(hero) : { gear: [], artifacts: [], totalCount: 0 }),
+    [hero?.equipment, hero?.inventory],
+  );
+
+  const openActiveEffects = () => activeEffectsRef.current?.present();
 
   // Redirect to onboarding if not completed
   const [onboardingChecked, setOnboardingChecked] = useState(false);
@@ -259,6 +272,7 @@ export default function CharacterSheet() {
       >
         <HeroIdentity />
         <StatBlock />
+        <ActiveEffectsButton count={activeEffects.totalCount} onPress={openActiveEffects} />
         <HealthTracker />
         <EquipmentSelector />
         <SpellTracker />
@@ -383,6 +397,12 @@ export default function CharacterSheet() {
         conflicts={conflicts}
         onResolve={resolveConflicts}
         onCancel={cancelConflicts}
+      />
+
+      <ActiveEffectsSheet
+        ref={activeEffectsRef}
+        gear={activeEffects.gear}
+        artifacts={activeEffects.artifacts}
       />
     </>
   );
