@@ -36,11 +36,9 @@ const PointTracker: React.FC<PointTrackerProps> = ({
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
-  const backgroundColor = useSharedValue('transparent');
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    backgroundColor: backgroundColor.value,
   }));
 
   const handlePress = async () => {
